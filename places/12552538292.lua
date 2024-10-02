@@ -577,7 +577,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         end
     end
 
-    setupDoorESP(room:WaitForChild("Entrances"):WaitForChild("NormalDoor"):WaitForChild("Door"))
+    setupDoorESP(room:WaitForChild("Entrances"):WaitForChild("NormalDoor"):WaitForChild("Door"), "Door")
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
