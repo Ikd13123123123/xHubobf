@@ -48,7 +48,11 @@ local nodeMonsters = {
 }
 
 local activeESP = {
-    CurrentRoom = {}
+    CurrentRoom = {
+        Interactables = {}
+    },
+
+    Doors = {}
 }
 
 local function _setupESP(properties)
@@ -105,7 +109,7 @@ local function setupItemESP(item, name)
         }
     })
 
-    table.insert(activeESP.CurrentRoom, esp)
+    table.insert(activeESP.CurrentRoom.Interactables, esp)
 end
 
 local function setupDoorESP(door, name)
@@ -114,7 +118,16 @@ local function setupDoorESP(door, name)
     local colour = options.DoorColour.Value
 
     local esp = _setupESP({
-        Name = name or door.Name
+        Name = name or door.Name,
+        Model = door,
+        FillColor = colour,
+        OutlineColor = colour,
+        TextColor = colour,
+
+        Tracer = {
+            Enabled = toggles.InteractableESPTracer.Value,
+            Color = colour
+        }
     })
 end
 
@@ -123,19 +136,19 @@ local function setupCurrentRoomESP(room)
         esp.Destroy()
     end
 
-    for _, thing in pairs(room:GetChildren()) do
-        local locations = thing:FindFirstChild("SpawnLocations")
+    -- for _, part in pairs(room:GetChildren()) do
+    --     local locations = part:FindFirstChild("SpawnLocations")
 
-        if locations then
-            for _, location in pairs(locations:GetChildren()) do
-                local item = location:FindFirstChildWhichIsA("Model")
+    --     if locations then
+    --         for _, location in pairs(locations:GetChildren()) do
+    --             local item = location:FindFirstChildWhichIsA("Model")
 
-                if item and item:FindFirstChild("ProxyPart") then
-                    setupItemESP(item, "Test")
-                end
-            end
-        end
-    end
+    --             if item and item:FindFirstChild("ProxyPart") then
+    --                 setupItemESP(item, "Test")
+    --             end
+    --         end
+    --     end
+    -- end
 end
 
 --// UI \\--
@@ -563,6 +576,8 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("The next room is dangerous. Careful as you enter!")
         end
     end
+
+    setupDoorESP(room.Entrances.NormalDoor)
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
