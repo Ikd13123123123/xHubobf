@@ -120,7 +120,7 @@ local function setupCurrentRoomESP(room)
             for _, location in pairs(locations:GetChildren()) do
                 local item = location:FindFirstChildWhichIsA("Model")
 
-                if item and string.find(item.Name, "Currency") then
+                if item and (string.find(item.Name, "Currency") or string.find(item.Name, "NormalKeyCard")) then
                     setupItemESP(item:WaitForChild("ProxyPart"))
                 end
             end
