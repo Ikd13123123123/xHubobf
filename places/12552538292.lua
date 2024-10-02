@@ -108,6 +108,16 @@ local function setupItemESP(item, name)
     table.insert(activeESP.CurrentRoom, esp)
 end
 
+local function setupDoorESP(door, name)
+    if not toggles.InteractableESP.Value then return end
+
+    local colour = options.DoorColour.Value
+
+    local esp = _setupESP({
+        Name = name or door.Name
+    })
+end
+
 local function setupCurrentRoomESP(room)
     for _, esp in pairs(activeESP.CurrentRoom) do
         esp.Destroy()
@@ -120,8 +130,8 @@ local function setupCurrentRoomESP(room)
             for _, location in pairs(locations:GetChildren()) do
                 local item = location:FindFirstChildWhichIsA("Model")
 
-                if item and (string.find(item.Name, "Currency") or string.find(item.Name, "NormalKeyCard")) then
-                    setupItemESP(item:WaitForChild("ProxyPart"))
+                if item and item:FindFirstChild("ProxyPart") then
+                    setupItemESP(item, "Test")
                 end
             end
         end
