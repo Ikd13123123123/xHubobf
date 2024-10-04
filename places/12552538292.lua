@@ -86,6 +86,18 @@ local function setupMonsterESP(monster, name)
     })
 end
 
+local function setupCurrentRoomESP(room)
+    for _, esp in pairs(activeESP.CurrentRoom) do
+        esp.Destroy()
+    end
+
+    for _, child in pairs(room:GetChildren()) do
+        if child.Name == "MonsterLocker" then
+            setupMonsterESP(child, "Void Mass")
+        end
+    end
+end
+
 --// UI \\--
 local window = library:CreateWindow({
     Title = "xHub - " .. player.DisplayName,
@@ -309,7 +321,7 @@ local esp = {
     Colours = tabs.ESP:AddRightGroupbox("Colours")
 }
 
-esp.Interactables:AddToggle("InteractableESP", { Text = "Enabled" })
+esp.Interactables:AddToggle("InteractableESP", { Text = "Enabled", Risky = true })
 
 esp.Interactables:AddDivider()
 
@@ -330,18 +342,7 @@ esp.Interactables:AddDropdown("InteractableESPList", {
 
 esp.Interactables:AddDivider()
 
-esp.Interactables:AddToggle("InteractableESPName", {
-    Text = "Name",
-    Callback = function(value)
-        if value then
-            setupCurrentRoomESP()
-        else
-            for _, _esp in pairs(activeESP.CurrentRoom) do
-                _esp.Destroy()
-            end
-        end
-    end
-})
+esp.Interactables:AddToggle("InteractableESPName", { Text = "Name", Risky = true })
 
 esp.Interactables:AddToggle("InteractableESPDistance", {
     Text = "Distance",
@@ -349,7 +350,7 @@ esp.Interactables:AddToggle("InteractableESPDistance", {
     Tooltip = "Not Implemented Yet"
 })
 
-esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers" })
+esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers", Risky = true })
 
 esp.Entities:AddToggle("EntityESP", { Text = "Enabled" })
 
@@ -363,7 +364,8 @@ esp.Entities:AddDropdown("EntityESPList", {
         "Node Monsters",
         "Pandemonium",
         "Wall Dwellers",
-        "Eyefestation"
+        "Eyefestation",
+        "Puddles of Void Mass"
     }
 })
 
