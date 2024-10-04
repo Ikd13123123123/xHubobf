@@ -261,6 +261,8 @@ entity.Exploits:AddToggle("AntiEyefestation", { Text = "Anti Eyefestation", Risk
 
 entity.Exploits:AddToggle("AntiImaginaryFriend", { Text = "Anti Imaginary Friend" })
 
+entity.Exploits:AddToggle("AntiPandemonium", { Text = "Anti Pandemonium", Risky = true })
+
 entity.Exploits:AddToggle("AntiSearchlights", { Text = "Anti Searchlights", Risky = true })
 
 entity.Exploits:AddToggle("AntiSquiddles", { Text = "Anti Squiddles", Risky = true })
@@ -367,6 +369,12 @@ esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
 
 esp.Other:AddToggle("VoidMassESP", {
     Text = "Void Mass ESP",
+    Risky = true,
+    Tooltip = "ALPHA, Not working yet"
+})
+
+esp.Other:AddToggle("BeaconESP", {
+    Text = "Water Beacon ESP",
     Risky = true,
     Tooltip = "ALPHA, Not working yet"
 })
@@ -501,27 +509,6 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
 
         if parent and (parent:FindFirstChild("Electricity") or parent:FindFirstChild("Pit")) then
             getgenv().Alert("The next room is dangerous. Careful as you enter!")
-        end
-    end
-
-    task.wait(0.1) -- Waiting for room and assets to load
-
-    if toggles.VoidMassESP.Value then
-        for _, child in pairs(room:GetChildren()) do
-            if child.Name == "MonsterLocker" then
-                setupMonsterESP(child:WaitForChild("highlight"), "Void Mass")
-            end
-        end
-    end
-
-    if toggles.BeaconESP.Value then
-        local parts = room:FindFirstChild("Parts")
-        if parts then
-            for _, child in pairs(parts:GetChildren()) do
-                if child.Name == "Beacon" then
-                    setupMonsterESP(child, "Beacon")
-                end
-            end
         end
     end
 end))
