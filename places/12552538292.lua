@@ -46,10 +46,6 @@ local nodeMonsters = {
     "RidgeBlitz"
 }
 
-local activeESP = {
-    CurrentRoom = {}
-}
-
 local function _setupESP(properties)
     local esp = ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
@@ -84,18 +80,6 @@ local function setupMonsterESP(monster, name)
             Color = colour
         }
     })
-end
-
-local function setupCurrentRoomESP(room)
-    for _, esp in pairs(activeESP.CurrentRoom) do
-        esp.Destroy()
-    end
-
-    for _, child in pairs(room:GetChildren()) do
-        if child.Name == "MonsterLocker" then
-            setupMonsterESP(child, "Void Mass")
-        end
-    end
 end
 
 --// UI \\--
@@ -317,6 +301,7 @@ notifiers.Rooms:AddToggle("RareRoomNotifier", { Text = "Rare Room Notifier" })
 local esp = {
     Interactables = tabs.ESP:AddLeftGroupbox("Interactables"),
     Entities = tabs.ESP:AddLeftGroupbox("Entities"),
+    Other = tabs.ESP:AddLeftGroupbox("Other"),
     Players = tabs.ESP:AddRightGroupbox("Players"),
     Colours = tabs.ESP:AddRightGroupbox("Colours")
 }
@@ -380,6 +365,8 @@ esp.Entities:AddToggle("EntityESPDistance", {
 })
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
+
+esp.Other:AddToggle("VoidMassESP", { Text = "Void Mass ESP (ALPHA, NOT WORKING YET)", Risky = true })
 
 esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
 
@@ -513,6 +500,14 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("The next room is dangerous. Careful as you enter!")
         end
     end
+
+    if toggles.VoidMassESP.Value then
+        for _, child in pairs(room:GetChildren()) do
+            if child.Name == "MonsterLocker" then
+                setupMonsterESP(child, "Void Mass")
+            end
+        end
+    end
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
@@ -628,8 +623,6 @@ oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
         if self == zoneChangeEvent then
             local args = { ... }
             local room = args[1]
-
-            task.spawn(setupCurrentRoomESP, room)
         end
     end
 
