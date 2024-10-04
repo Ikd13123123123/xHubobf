@@ -366,7 +366,11 @@ esp.Entities:AddToggle("EntityESPDistance", {
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
 
-esp.Other:AddToggle("VoidMassESP", { Text = "Void Mass ESP (ALPHA, NOT WORKING YET)", Risky = true })
+esp.Other:AddToggle("VoidMassESP", {
+    Text = "Void Mass ESP",
+    Risky = true,
+    Tooltip = "ALPHA, Not working yet"
+})
 
 esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
 
@@ -504,7 +508,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     if toggles.VoidMassESP.Value then
         for _, child in pairs(room:GetChildren()) do
             if child.Name == "MonsterLocker" then
-                setupMonsterESP(child, "Void Mass")
+                setupMonsterESP(child:WaitForChild("highlight"), "Void Mass")
             end
         end
     end
