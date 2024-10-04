@@ -18,7 +18,6 @@ local proximityPromptService = game:GetService("ProximityPromptService")
 
 local rooms = workspace:WaitForChild("Rooms")
 local monsters = workspace:WaitForChild("Monsters")
-local currentRoom = rooms:WaitForChild("Start")
 
 local ESPLib = getgenv().mstudio45.ESPLibrary
 local themes = getgenv().ThemeManager
@@ -48,11 +47,7 @@ local nodeMonsters = {
 }
 
 local activeESP = {
-    CurrentRoom = {
-        Interactables = {}
-    },
-
-    Doors = {}
+    CurrentRoom = {}
 }
 
 local function _setupESP(properties)
@@ -89,66 +84,6 @@ local function setupMonsterESP(monster, name)
             Color = colour
         }
     })
-end
-
-local function setupItemESP(item, name)
-    if not toggles.InteractableESP.Value then return end
-
-    local colour = options.ItemColour.Value
-
-    local esp = _setupESP({
-        Name = name or item.Name,
-        Model = item,
-        FillColor = colour,
-        OutlineColor = colour,
-        TextColor = colour,
-
-        Tracer = {
-            Enabled = toggles.InteractableESPTracer.Value,
-            Color = colour
-        }
-    })
-
-    table.insert(activeESP.CurrentRoom.Interactables, esp)
-end
-
-local function setupDoorESP(door, name)
-    if not toggles.InteractableESP.Value then return end
-
-    local colour = options.DoorColour.Value
-
-    local esp = _setupESP({
-        Name = name or door.Name,
-        Model = door,
-        FillColor = colour,
-        OutlineColor = colour,
-        TextColor = colour,
-
-        Tracer = {
-            Enabled = toggles.InteractableESPTracer.Value,
-            Color = colour
-        }
-    })
-end
-
-local function setupCurrentRoomESP(room)
-    for _, esp in pairs(activeESP.CurrentRoom) do
-        esp.Destroy()
-    end
-
-    -- for _, part in pairs(room:GetChildren()) do
-    --     local locations = part:FindFirstChild("SpawnLocations")
-
-    --     if locations then
-    --         for _, location in pairs(locations:GetChildren()) do
-    --             local item = location:FindFirstChildWhichIsA("Model")
-
-    --             if item and item:FindFirstChild("ProxyPart") then
-    --                 setupItemESP(item, "Test")
-    --             end
-    --         end
-    --     end
-    -- end
 end
 
 --// UI \\--
@@ -399,7 +334,7 @@ esp.Interactables:AddToggle("InteractableESPName", {
     Text = "Name",
     Callback = function(value)
         if value then
-            setupCurrentRoomESP(currentRoom)
+            setupCurrentRoomESP()
         else
             for _, _esp in pairs(activeESP.CurrentRoom) do
                 _esp.Destroy()
@@ -576,8 +511,6 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("The next room is dangerous. Careful as you enter!")
         end
     end
-
-    setupDoorESP(room:WaitForChild("Entrances"):WaitForChild("NormalDoor"):WaitForChild("Door"), "Door")
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
@@ -694,9 +627,7 @@ oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
             local args = { ... }
             local room = args[1]
 
-            currentRoom = room
-
-            task.spawn(setupCurrentRoomESP, room)
+            task.spawn(setupCurrentRoomESP)
         end
     end
 
