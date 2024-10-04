@@ -504,10 +504,23 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         end
     end
 
+    task.wait(0.1) -- Waiting for room and assets to load
+
     if toggles.VoidMassESP.Value then
         for _, child in pairs(room:GetChildren()) do
             if child.Name == "MonsterLocker" then
                 setupMonsterESP(child:WaitForChild("highlight"), "Void Mass")
+            end
+        end
+    end
+
+    if toggles.BeaconESP.Value then
+        local parts = room:FindFirstChild("Parts")
+        if parts then
+            for _, child in pairs(parts:GetChildren()) do
+                if child.Name == "Beacon" then
+                    setupMonsterESP(child, "Beacon")
+                end
             end
         end
     end
