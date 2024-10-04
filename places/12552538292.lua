@@ -349,8 +349,7 @@ esp.Entities:AddDropdown("EntityESPList", {
         "Node Monsters",
         "Pandemonium",
         "Wall Dwellers",
-        "Eyefestation",
-        "Puddles of Void Mass"
+        "Eyefestation"
     }
 })
 
