@@ -50,6 +50,11 @@ local nodeMonsters = {
     "RidgeBlitz"
 }
 
+local currentRoomStuff = {
+    Connections = {},
+    ESP = {}
+}
+
 local function _ESP(properties)
     local esp = ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
@@ -109,6 +114,25 @@ local function interactableESP(interactable, colour, name)
             Color = colour
         }
     })
+end
+
+local function setupCurrentRoomStuff(room)
+    for _, connection in pairs(currentRoomStuff.Connections) do connection:Disconnect() end
+    for _, esp in pairs(currentRoomStuff.ESP) do esp.Destroy() end
+
+    for _, child in pairs(room:GetChildren()) do
+        if child.Name == "Lever" then
+            table.insert(currentRoomStuff.ESP, interactableESP(child, options.LeverColour.Value))
+        end
+
+        if child.Name == "MonsterLocker" then
+            table.insert(currentRoomStuff.ESP, monsterESP(child, "Void Mass"))
+        end
+    end
+
+    table.insert(currentRoomStuff.Connections, room.DescendantAdded:Connect(function(descendant)
+        print("Added")
+    end))
 end
 
 --// UI \\--
@@ -565,19 +589,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         getgenv().Alert("The next room is dangerous!")
     end
 
-    table.foreach(room:GetChildren(), print)
-
-    if options.InteractableESPList.Value["Levers"] then
-        local lever = room:WaitForChild("Lever", 1)
-
-        if lever then
-            interactableESP(lever, options.LeverColour.Value)
-        end
-    end
-
-    local interactables = room:WaitForChild("Interactables")
-
-    interactables.DescendantAdded:Connect(function(possibleEyefestation)
+    room.DescendantAdded:Connect(function(possibleEyefestation)
         if possibleEyefestation.Name ~= "Eyefestation" then return end
 
         if toggles.EyefestationNotifier.Value then
@@ -595,6 +607,10 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             end)
         end
     end)
+
+    print("Room Generated")
+
+    table.foreach(room:GetChildren(), print)
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
