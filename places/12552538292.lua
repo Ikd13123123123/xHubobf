@@ -49,7 +49,7 @@ local nodeMonsters = {
     "RidgeBlitz"
 }
 
-local function _setupESP(properties)
+local function _ESP(properties)
     local esp = ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
         Model = properties.Model,
@@ -66,7 +66,7 @@ local function _setupESP(properties)
     return esp
 end
 
-local function setupMonsterESP(monster, name)
+local function monsterESP(monster, name)
     if not toggles.EntityESP.Value then return end
 
     local tracerEnabled
@@ -79,7 +79,7 @@ local function setupMonsterESP(monster, name)
 
     local colour = options.EntityColour.Value
 
-    _setupESP({
+    _ESP({
         Name = name or monster.Name,
         Model = monster,
         FillColor = colour,
@@ -88,6 +88,23 @@ local function setupMonsterESP(monster, name)
 
         Tracer = {
             Enabled = tracerEnabled,
+            Color = colour
+        }
+    })
+end
+
+local function interactableESP(interactable, colour, name)
+    if not toggles.InteractableESP.Value then return end
+
+    _ESP({
+        Name = name or interactable.Name,
+        Model = interactable,
+        FillColor = colour,
+        OutlineColor = colour,
+        TextColor = colour,
+
+        Tracer = {
+            Enabled = options.InteractableESP.Value,
             Color = colour
         }
     })
@@ -113,7 +130,7 @@ local main = {
     Movement = tabs.Main:AddLeftGroupbox("Movement"),
     Sound = tabs.Main:AddLeftGroupbox("Sound"),
     Interaction = tabs.Main:AddRightGroupbox("Interaction"),
-    Exploits = tabs.Main:AddRightGroupbox("Exploits")
+    Other = tabs.Main:AddRightGroupbox("Other")
 }
 
 main.Movement:AddSlider("SpeedBoost", {
@@ -206,12 +223,12 @@ main.Sound:AddToggle("NoAnticipationMusic", {
     end
 })
 
-main.Exploits:AddToggle("LessLag", {
+main.Other:AddToggle("LessLag", {
     Text = "Performance Increase",
     Tooltip = "Just a few optimisations"
 })
 
-main.Exploits:AddButton({
+main.Other:AddButton({
     Text = "Play Again",
     DoubleClick = true,
     Func = function()
@@ -361,7 +378,7 @@ esp.Interactables:AddDropdown("InteractableESPList", {
         "Money",
         "Doors",
         "Generators",
-        "Turret Controls"
+        "Levers"
     }
 })
 
@@ -446,6 +463,10 @@ esp.Colours:AddLabel("Generators"):AddColorPicker("GeneratorColour", {
     Default = Color3.fromRGB(0, 255, 255)
 })
 
+esp.Colours:AddLabel("Levers"):AddColorPicker("LeverColour", {
+    Default = Color3.fromRGB(0, 255, 255)
+})
+
 esp.Colours:AddLabel("Entities"):AddColorPicker("EntityColour", {
     Default = Color3.fromRGB(0, 0, 255)
 })
@@ -471,25 +492,25 @@ end))
 library:GiveSignal(workspace.ChildAdded:Connect(function(child)
     local roomNumber = events.CurrentRoomNumber:InvokeServer()
 
-    if roomNumber == 100 then return end
+    if roomNumber ~= 100 then
+        if toggles.NodeMonsterNotifier.Value then
+            for _, monster in ipairs(nodeMonsters) do
+                if child.Name == monster then
+                    local name = string.gsub(monster, "Ridge", "")
 
-    if toggles.NodeMonsterNotifier.Value then
-        for _, monster in ipairs(nodeMonsters) do
-            if child.Name == monster then
-                local name = string.gsub(monster, "Ridge", "")
+                    getgenv().Alert(name .. " spawned. Hide!")
 
-                getgenv().Alert(name .. " spawned. Hide!")
-
-                if options.EntityESPList.Value["Node Monsters"] then setupMonsterESP(child, name) end
+                    if options.EntityESPList.Value["Node Monsters"] then monsterESP(child, name) end
+                end
             end
         end
-    end
 
-    if toggles.PandemoniumNotifier.Value and child.Name == "Pandemonium" then
-        getgenv().Alert("Pandemonium spawned. Good luck!")
+        if toggles.PandemoniumNotifier.Value and child.Name == "Pandemonium" then
+            getgenv().Alert("Pandemonium spawned. Good luck!")
 
-        if options.EntityESPList.Value["Pandemonium"] then
-            setupMonsterESP(child)
+            if options.EntityESPList.Value["Pandemonium"] then
+                monsterESP(child)
+            end
         end
     end
 
@@ -500,6 +521,14 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
     if toggles.LopeeNotifier.Value and child.Name == "LopeePart" then
         getgenv().Alert("Mr. Lopee spawned!")
     end
+
+    if toggles.AntiImaginaryFriend.Value and child.Name == "FriendPart" then
+        child.ChildAdded:Connect(function(possibleSound)
+            if possibleSound:IsA("Sound") then
+                possibleSound:Destroy()
+            end
+        end)
+    end
 end))
 
 library:GiveSignal(monsters.ChildAdded:Connect(function(monster)
@@ -507,7 +536,7 @@ library:GiveSignal(monsters.ChildAdded:Connect(function(monster)
         getgenv().Alert("A Wall Dweller has spawned in the walls. Find it!")
     end
 
-    if options.EntityESPList.Value["Wall Dwellers"] then setupMonsterESP(monster, "Wall Dweller") end
+    if options.EntityESPList.Value["Wall Dwellers"] then monsterESP(monster, "Wall Dweller") end
 end))
 
 library:GiveSignal(playerGui.ChildAdded:Connect(function(child)
@@ -518,12 +547,17 @@ library:GiveSignal(playerGui.ChildAdded:Connect(function(child)
     if friend then
         friend.Friend.Transparency = 1
     end
-
-    child.ViewportFrame.ImaginaryFriend.Friend.Transparency = 1
 end))
 
 library:GiveSignal(rooms.ChildAdded:Connect(function(room)
-    if toggles.RareRoomNotifier.Value and (room.Name == "ValculaVoidMass" or room.Name == "Mindscape" or room.Name == "KeyKeyKeyKeyKey" or string.find(room.Name, "IntentionallyUnfinished") or room.Name == "AirlockStart") then
+    if toggles.RareRoomNotifier.Value and (
+            room.Name == "ValculaVoidMass" or
+            room.Name == "Mindscape" or
+            room.Name == "KeyKeyKeyKeyKey" or
+            room.Name == "AirlockStart" or
+            room.Name == "HCCheckpointStart" or
+            string.find(room.Name, "IntentionallyUnfinished")
+        ) then
         getgenv().Alert("The next room is rare!")
     end
 
@@ -535,7 +569,11 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         getgenv().Alert("The next room is a gauntlet. Good luck!")
     end
 
-    if toggles.PuzzleNotifier.Value and (string.find(room.Name, "PipeBoard") or string.find(room.Name, "Steam")) then
+    if toggles.PuzzleNotifier.Value and (
+            string.find(room.Name, "PipeBoard") or
+            string.find(room.Name, "Steam") or
+            string.find(room.Name, "Puzzle")
+        ) then
         getgenv().Alert("The next room is a puzzle!")
     end
 
@@ -548,6 +586,16 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         getgenv().Alert("The next room is dangerous!")
     end
 
+    table.foreach(room:GetChildren(), print)
+
+    if options.InteractableESPList.Value["Levers"] then
+        local lever = room:WaitForChild("Lever", 1)
+
+        if lever then
+            interactableESP(lever, options.LeverColour.Value)
+        end
+    end
+
     local interactables = room:WaitForChild("Interactables")
 
     interactables.DescendantAdded:Connect(function(possibleEyefestation)
@@ -557,7 +605,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("Eyefestation Spawned!")
         end
         if options.EntityESPList.Value["Eyefestation"] then
-            setupMonsterESP(possibleEyefestation)
+            monsterESP(possibleEyefestation)
         end
         if toggles.AntiEyefestation.Value then
             local active = possibleEyefestation:WaitForChild("Active")
@@ -570,31 +618,15 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     end)
 end))
 
+library:GiveSignal(player.Character.LowerTorso.ChildAdded:Connect(function(child)
+    if toggles.NoFootsteps.Value then
+        child:Destroy()
+    end
+end))
+
 library:GiveSignal(runService.RenderStepped:Connect(function()
     if toggles.NoAmbience.Value then
         local part = workspace:FindFirstChild("AmbiencePart")
-
-        if part then
-            local child = part:FindFirstChildWhichIsA("Sound")
-
-            if child then
-                child:Destroy()
-            end
-        end
-    end
-
-    if toggles.NoFootsteps.Value then
-        for _, char in pairs(workspace.Characters:GetChildren()) do
-            for _, child in (char.LowerTorso:GetChildren()) do
-                if child:IsA("Sound") then
-                    child:Destroy()
-                end
-            end
-        end
-    end
-
-    if toggles.AntiImaginaryFriend.Value then
-        local part = workspace:FindFirstChild("FriendPart")
 
         if part then
             local child = part:FindFirstChildWhichIsA("Sound")
@@ -686,7 +718,7 @@ oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
     task.spawn(function()
         if method == "FireServer" then
             if self == zoneChangeEvent then
-                print("Entered room: " .. room.Name)
+                print("Changed Room!")
             end
         end
     end)
