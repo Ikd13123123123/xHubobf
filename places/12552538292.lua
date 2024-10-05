@@ -18,6 +18,7 @@ local proximityPromptService = game:GetService("ProximityPromptService")
 
 local rooms = workspace:WaitForChild("Rooms")
 local monsters = workspace:WaitForChild("Monsters")
+local events = repStorage:WaitForChild("Events")
 
 local ESPLib = getgenv().mstudio45.ESPLibrary
 local themes = getgenv().ThemeManager
@@ -200,7 +201,7 @@ main.Exploits:AddButton({
     Text = "Play Again",
     DoubleClick = true,
     Func = function()
-        repStorage.Events.PlayAgain:FireServer()
+        events.PlayAgain:FireServer()
         library:Notify("Teleporting in 5")
         for i = 1, 4 do
             task.wait(1)
@@ -434,7 +435,7 @@ library:GiveSignal(proximityPromptService.PromptButtonHoldBegan:Connect(function
 end))
 
 library:GiveSignal(workspace.ChildAdded:Connect(function(child)
-    local roomNumber = repStorage.Events.CurrentRoomNumber:InvokeServer()
+    local roomNumber = events.CurrentRoomNumber:InvokeServer()
 
     if roomNumber == 100 then return end
 
@@ -613,3 +614,26 @@ themes:ApplyToTab(tabs.Settings)
 saves:BuildConfigSection(tabs.Settings)
 
 saves:LoadAutoloadConfig()
+
+-- Event Hooking
+local zoneChangeEvent = events.ZoneChange
+
+-- Method Hooking
+
+local oldMethod
+oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+
+    local args = { ... }
+    local room = args[1]
+
+    task.spawn(function()
+        if method == "FireServer" then
+            if self == zoneChangeEvent then
+                print("Entered room: " .. room.Name)
+            end
+        end
+    end)
+
+    return oldMethod(self, ...)
+end)
