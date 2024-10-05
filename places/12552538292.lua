@@ -358,7 +358,9 @@ esp.Entities:AddDropdown("EntityESPList", {
         "Node Monsters",
         "Pandemonium",
         "Wall Dwellers",
-        "Eyefestation"
+        "Eyefestation",
+        "Turrets",
+        "Void Mass"
     }
 })
 
@@ -373,12 +375,6 @@ esp.Entities:AddToggle("EntityESPDistance", {
 })
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
-
-esp.Other:AddToggle("VoidMassESP", {
-    Text = "Void Mass ESP",
-    Risky = true,
-    Tooltip = "ALPHA, Not working yet"
-})
 
 esp.Other:AddToggle("BeaconESP", {
     Text = "Water Beacon ESP",
@@ -513,7 +509,12 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         getgenv().Alert("The next room is a puzzle!")
     end
 
-    if toggles.DangerousNotifier.Value and (room.Name == "RoundaboutDestroyed2" or string.find(room.Name, "Electrfieid")) then
+    if toggles.DangerousNotifier.Value and (
+            room.Name == "RoundaboutDestroyed2" or
+            room.Name == "LongStraightBrokenSide" or
+            string.find(room.Name, "Electrfieid") or
+            string.find(room.Name, "BigHole")
+        ) then
         getgenv().Alert("The next room is dangerous!")
     end
 
@@ -530,10 +531,11 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
                 setupMonsterESP(child)
             end
             if toggles.AntiEyefestation.Value then
-                child:WaitForChild("Active").Changed:Connect(function(value)
+                local active = child:WaitForChild("Active")
+                active.Changed:Connect(function(value)
                     if not value then return end
 
-                    value = false
+                    active.Value = false
                 end)
             end
         end)
