@@ -520,13 +520,14 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     if spawn then
         spawn.ChildAdded:Connect(function(child)
             if toggles.EyefestationNotifier.Value then
-                library.Alert("Eyefestation Spawned!")
+                getgenv().Alert("Eyefestation Spawned!")
             end
             if options.EntityESPList.Value["Eyefestation"] then
                 setupMonsterESP(child)
             end
             if toggles.AntiEyefestation.Value then
                 child:WaitForChild("Active").Changed:Connect(function(value)
+                    getgenv().Alert("Changed")
                     if not value then return end
 
                     value = false
