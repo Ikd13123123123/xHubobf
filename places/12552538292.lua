@@ -512,6 +512,44 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("The next room is dangerous. Careful as you enter!")
         end
     end
+
+    local interactables = room:WaitForChild("Interactables")
+
+    local spawn = interactables:WaitForChild("EyefestationSpawn", 1)
+
+    if spawn then
+        spawn.ChildAdded:Connect(function(child)
+            if toggles.EyefestationNotifier.Value then
+                library.Alert("Eyefestation Spawned!")
+            end
+            if options.EntityESPList.Value["Eyefestation"] then
+                setupMonsterESP(child)
+            end
+            if toggles.AntiEyefestation.Value then
+                child:WaitForChild("Active").Changed:Connect(function(value)
+                    if not value then return end
+
+                    value = false
+                end)
+            end
+        end)
+
+        spawn.ChildRemoved:Connect(function(child)
+            for _, connection in pairs(getconnections(child.Active.Changed)) do
+                connection:Disconnect()
+            end
+        end)
+    end
+end))
+
+library:GiveSignal(rooms.ChildRemoved:Connect(function(room)
+    local spawn = room.Interactables:FindFirstChild("EyefestationSpawn")
+
+    if spawn then
+        for _, connection in pairs(getconnections(spawn.ChildAdded)) do
+            connection:Disconnect()
+        end
+    end
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
