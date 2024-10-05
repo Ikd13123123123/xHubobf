@@ -116,9 +116,13 @@ local function interactableESP(interactable, colour, name)
     })
 end
 
-local function setupCurrentRoomStuff(room)
+local function clearCurrentRoomStuff()
     for _, connection in pairs(currentRoomStuff.Connections) do connection:Disconnect() end
     for _, esp in pairs(currentRoomStuff.ESP) do esp.Destroy() end
+end
+
+local function setupCurrentRoomStuff(room)
+    clearCurrentRoomStuff()
 
     for _, child in pairs(room:GetChildren()) do
         if child.Name == "Lever" then
@@ -690,6 +694,7 @@ settings.Credits:AddLabel("xBackpack - Creator & Scripter")
 library.ToggleKeybind = options.MenuKeybind
 
 library:OnUnload(function()
+    clearCurrentRoomStuff()
     ESPLib.ESP.Clear()
     getgenv().Alert = nil
     getgenv().xhub_loaded = nil
@@ -725,7 +730,7 @@ oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
     task.spawn(function()
         if method == "FireServer" then
             if self == zoneChangeEvent then
-                print("Changed Room!")
+                setupCurrentRoomStuff(room)
             end
         end
     end)
