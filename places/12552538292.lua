@@ -258,7 +258,7 @@ local entity = {
     Exploits = tabs.Entity:AddLeftGroupbox("Exploits")
 }
 
-entity.Exploits:AddToggle("AntiEyefestation", { Text = "Anti Eyefestation", Risky = true })
+entity.Exploits:AddToggle("AntiEyefestation", { Text = "Anti Eyefestation" })
 
 entity.Exploits:AddToggle("AntiImaginaryFriend", { Text = "Anti Imaginary Friend" })
 
@@ -285,7 +285,7 @@ notifiers.Entity:AddToggle("PandemoniumNotifier", { Text = "Pandemonium Notifier
 
 notifiers.Entity:AddToggle("WallDwellerNotifier", { Text = "Wall Dweller Notifier" })
 
-notifiers.Entity:AddToggle("EyefestationNotifier", { Text = "Eyefestation Notifier", Risky = true })
+notifiers.Entity:AddToggle("EyefestationNotifier", { Text = "Eyefestation Notifier" })
 
 notifiers.Entity:AddToggle("LopeeNotifier", { Text = "Mr. Lopee Notifier " })
 
@@ -526,30 +526,14 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
                 setupMonsterESP(child)
             end
             if toggles.AntiEyefestation.Value then
-                child:WaitForChild("Active").Changed:Connect(function(value)
-                    getgenv().Alert("Changed")
+                local active = child:WaitForChild("Active")
+                active.Changed:Connect(function(value)
                     if not value then return end
 
-                    value = false
+                    child.Active.Value = false
                 end)
             end
         end)
-
-        spawn.ChildRemoved:Connect(function(child)
-            for _, connection in pairs(getconnections(child.Active.Changed)) do
-                connection:Disconnect()
-            end
-        end)
-    end
-end))
-
-library:GiveSignal(rooms.ChildRemoved:Connect(function(room)
-    local spawn = room.Interactables:FindFirstChild("EyefestationSpawn")
-
-    if spawn then
-        for _, connection in pairs(getconnections(spawn.ChildAdded)) do
-            connection:Disconnect()
-        end
     end
 end))
 
