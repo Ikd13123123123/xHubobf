@@ -521,14 +521,6 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
     if toggles.LopeeNotifier.Value and child.Name == "LopeePart" then
         getgenv().Alert("Mr. Lopee spawned!")
     end
-
-    if toggles.AntiImaginaryFriend.Value and child.Name == "FriendPart" then
-        child.ChildAdded:Connect(function(possibleSound)
-            if possibleSound:IsA("Sound") then
-                possibleSound:Destroy()
-            end
-        end)
-    end
 end))
 
 library:GiveSignal(monsters.ChildAdded:Connect(function(monster)
@@ -618,22 +610,30 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     end)
 end))
 
-library:GiveSignal(player.Character.LowerTorso.ChildAdded:Connect(function(child)
-    if toggles.NoFootsteps.Value and child:IsA("Sound") then
-        child:Destroy()
-    end
-end))
-
 library:GiveSignal(runService.RenderStepped:Connect(function()
     if toggles.NoAmbience.Value then
         local part = workspace:FindFirstChild("AmbiencePart")
 
         if part then
-            local child = part:FindFirstChildWhichIsA("Sound")
+            local sound = part:FindFirstChildWhichIsA("Sound")
 
-            if child then
-                child:Destroy()
-            end
+            if sound then sound:Destroy() end
+        end
+    end
+
+    if toggles.NoFootsteps.Value then
+        local sound = player.Character.LowerTorso:FindFirstChildWhichIsA("Sound")
+
+        if sound then sound:Destroy() end
+    end
+
+    if toggles.AntiImaginaryFriend.Value then
+        local part = workspace:FindFirstChild("FriendPart")
+
+        if part then
+            local sound = part:FindFirstChildWhichIsA("Sound")
+
+            if sound then sound:Destroy() end
         end
     end
 
