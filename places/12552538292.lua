@@ -594,11 +594,9 @@ settings.Credits:AddLabel("xBackpack - Creator & Scripter")
 library.ToggleKeybind = options.MenuKeybind
 
 library:OnUnload(function()
-    getgenv().Alert("Unloading!")
     ESPLib.ESP.Clear()
     getgenv().Alert = nil
     getgenv().xhub_loaded = nil
-    task.wait(.5)
 end)
 
 themes:SetLibrary(library)
@@ -615,19 +613,3 @@ themes:ApplyToTab(tabs.Settings)
 saves:BuildConfigSection(tabs.Settings)
 
 saves:LoadAutoloadConfig()
-
--- Event Hooking
-local zoneChangeEvent = repStorage:WaitForChild("Events"):WaitForChild("ZoneChange")
-
-local oldMethod
-oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    if method == "FireServer" then
-        if self == zoneChangeEvent then
-            local args = { ... }
-            local room = args[1]
-        end
-    end
-
-    return oldMethod(self, ...)
-end)

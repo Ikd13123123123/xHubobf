@@ -27,6 +27,7 @@ end
 
 if not foundGame then
     getgenv().Alert("The place you are currently in is not valid. Please look at our github for a list of valid games!")
+    getgenv().Alert = nil
     task.wait(5)
     library:Unload()
 end
