@@ -12,7 +12,7 @@ getgenv().SaveManager = loadstring(game:HttpGet(addons .. 'SaveManager.lua'))()
 local library = getgenv().Library
 
 getgenv().Alert = function(message)
-    library:Notify(message, 5, "rbxassetid://4590662766")
+    library:Notify("[xHub] " .. message, 5, "rbxassetid://4590662766")
 end
 
 local placesRepo = "https://raw.githubusercontent.com/xBackpack/xHub/refs/heads/main/places/"

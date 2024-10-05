@@ -4,7 +4,7 @@ local library = getgenv().Library
 if not getgenv().xhub_loaded then
     getgenv().xhub_loaded = true
 else
-    library:Notify("Already Loaded!")
+    library:Notify("[xHub] Already Loaded!")
     return
 end
 
@@ -125,6 +125,8 @@ main.Movement:AddToggle("FasterSpeed", {
     end
 })
 
+main.Movement:AddDivider()
+
 main.Movement:AddSlider("JumpHeight", {
     Text = "Jump Power",
     Default = 0,
@@ -132,6 +134,8 @@ main.Movement:AddSlider("JumpHeight", {
     Max = 20,
     Rounding = 0
 })
+
+main.Movement:AddDivider()
 
 main.Movement:AddToggle("Noclip", {
     Text = "Noclip",
@@ -202,7 +206,7 @@ main.Exploits:AddButton({
     DoubleClick = true,
     Func = function()
         events.PlayAgain:FireServer()
-        library:Notify("Teleporting in 5")
+        library:Notify("[xHub] Teleporting in 5")
         for i = 1, 4 do
             task.wait(1)
             library:Notify(5 - i)
@@ -225,6 +229,8 @@ visual.Camera:AddSlider("FieldOfView", {
     Rounding = 0,
     Callback = function(value) camera.FieldOfView = value end
 })
+
+visual.Camera:AddDivider()
 
 visual.Camera:AddToggle("ThirdPerson", {
     Text = "Third Person"
@@ -407,7 +413,7 @@ esp.Colours:AddLabel("Money"):AddColorPicker("MoneyColour", {
 })
 
 esp.Colours:AddLabel("Doors"):AddColorPicker("DoorColour", {
-    Default = Color3.fromRGB(0, 255, 0)
+    Default = Color3.fromRGB(255, 0, 255)
 })
 
 esp.Colours:AddLabel("Generators"):AddColorPicker("GeneratorColour", {
@@ -421,6 +427,8 @@ esp.Colours:AddLabel("Entities"):AddColorPicker("EntityColour", {
 esp.Colours:AddLabel("Players"):AddColorPicker("PlayerColour", {
     Default = Color3.fromRGB(255, 255, 255)
 })
+
+esp.Colours:AddDivider()
 
 esp.Colours:AddToggle("RainbowESP", {
     Text = "Rainbow ESP",
@@ -505,12 +513,8 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         getgenv().Alert("The next room is a puzzle!")
     end
 
-    if toggles.DangerousNotifier.Value then
-        local parent = room:FindFirstChild("DamageParts") or room:FindFirstChild("DamagePart")
-
-        if parent and (parent:FindFirstChild("Electricity") or parent:FindFirstChild("Pit")) then
-            getgenv().Alert("The next room is dangerous. Careful as you enter!")
-        end
+    if toggles.DangerousNotifier.Value and (room.Name == "RoundaboutDestroyed2" or string.find(room.Name, "Electrfieid")) then
+        getgenv().Alert("The next room is dangerous!")
     end
 
     local interactables = room:WaitForChild("Interactables")
@@ -526,11 +530,10 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
                 setupMonsterESP(child)
             end
             if toggles.AntiEyefestation.Value then
-                local active = child:WaitForChild("Active")
-                active.Changed:Connect(function(value)
+                child:WaitForChild("Active").Changed:Connect(function(value)
                     if not value then return end
 
-                    child.Active.Value = false
+                    value = false
                 end)
             end
         end)

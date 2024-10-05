@@ -15,9 +15,8 @@ Done!
 ## Upcoming Features
 
 - Auto Interact
-- ESP for doors, documents, entities, items, keycards, lockers, and more!
+- ESP for doors, documents, items, keycards, lockers, and more!
 - Transparent Closets
-- Auto complete bossfights
 - Auto revive
 - Unredact all documents
 - Fly
