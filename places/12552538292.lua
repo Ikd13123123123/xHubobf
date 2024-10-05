@@ -274,12 +274,16 @@ visual.Lighting:AddToggle("NoFog", {
         if value then
             blur.Size = 0
             depthOfField.FarIntensity = 0
+        else
+            blur.Size = 4
+            depthOfField.FarIntensity = 0.25
         end
     end
 })
 
 visual.Lighting:AddToggle("XRayVision", {
-    Text = "X-ray effect (Not X-ray vision haha)",
+    Text = "X-ray effect",
+    Tooltip = "Not X-ray vision haha",
     Callback = function(value)
         lighting:WaitForChild("Test").Enabled = value
     end
