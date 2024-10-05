@@ -405,7 +405,7 @@ esp.Entities:AddDropdown("EntityESPList", {
 
 esp.Entities:AddDivider()
 
-esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
+esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer", Risky = true })
 
 esp.Other:AddToggle("TurretESP", {
     Text = "Turret ESP",
@@ -423,8 +423,6 @@ esp.Other:AddToggle("BeaconESP", {
 })
 
 esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
-
-esp.Players:AddDivider()
 
 esp.Players:AddToggle("PlayerESPTracer", { Text = "Tracer", Risky = true })
 
