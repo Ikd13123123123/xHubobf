@@ -105,7 +105,7 @@ local function interactableESP(interactable, colour, name)
         TextColor = colour,
 
         Tracer = {
-            Enabled = toggles.InteractableESP.Value,
+            Enabled = toggles.InteractableESPTracer.Value,
             Color = colour
         }
     })
@@ -385,10 +385,6 @@ esp.Interactables:AddDropdown("InteractableESPList", {
 
 esp.Interactables:AddDivider()
 
-esp.Interactables:AddToggle("InteractableESPName", { Text = "Name", Risky = true })
-
-esp.Interactables:AddToggle("InteractableESPDistance", { Text = "Distance", Risky = true })
-
 esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers", Risky = true })
 
 esp.Entities:AddToggle("EntityESP", { Text = "Enabled" })
@@ -408,10 +404,6 @@ esp.Entities:AddDropdown("EntityESPList", {
 })
 
 esp.Entities:AddDivider()
-
-esp.Entities:AddToggle("EntityESPName", { Text = "Name" })
-
-esp.Entities:AddToggle("EntityESPDistance", { Text = "Distance", Risky = true })
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
 
@@ -433,10 +425,6 @@ esp.Other:AddToggle("BeaconESP", {
 esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
 
 esp.Players:AddDivider()
-
-esp.Players:AddToggle("PlayerESPName", { Text = "Name", Risky = true })
-
-esp.Players:AddToggle("PlayerESPDistance", { Text = "Distance", Risky = true })
 
 esp.Players:AddToggle("PlayerESPTracer", { Text = "Tracer", Risky = true })
 
