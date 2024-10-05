@@ -18,6 +18,7 @@ local proximityPromptService = game:GetService("ProximityPromptService")
 
 local rooms = workspace:WaitForChild("Rooms")
 local monsters = workspace:WaitForChild("Monsters")
+local characters = workspace:WaitForChild("Characters")
 local events = repStorage:WaitForChild("Events")
 local blur = lighting:WaitForChild("Blur")
 local depthOfField = lighting:WaitForChild("DepthOfField")
@@ -53,13 +54,13 @@ local function _ESP(properties)
     local esp = ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
         Model = properties.Model,
-        FillColor = properties.FillColour,
-        OutlineColor = properties.OutlineColour,
-        TextColor = properties.EntityColour,
+        FillColor = properties.FillColor,
+        OutlineColor = properties.OutlineColor,
+        TextColor = properties.TextColor,
 
         Tracer = {
             Enabled = properties.Tracer.Enabled,
-            Color = properties.Tracer.Colour
+            Color = properties.Tracer.Color
         }
     })
 
@@ -104,7 +105,7 @@ local function interactableESP(interactable, colour, name)
         TextColor = colour,
 
         Tracer = {
-            Enabled = options.InteractableESP.Value,
+            Enabled = toggles.InteractableESP.Value,
             Color = colour
         }
     })
@@ -570,7 +571,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     end
 
     if toggles.DangerousNotifier.Value and (
-            room.Name == "RoundaboutDestroyed2" or
+            room.Name == "RoundaboutDestroyed1" or
             room.Name == "LongStraightBrokenSide" or
             string.find(room.Name, "Electrfieid") or
             string.find(room.Name, "BigHole")
@@ -622,9 +623,13 @@ library:GiveSignal(runService.RenderStepped:Connect(function()
     end
 
     if toggles.NoFootsteps.Value then
-        local sound = player.Character.LowerTorso:FindFirstChildWhichIsA("Sound")
-
-        if sound then sound:Destroy() end
+        for _, char in pairs(characters:GetChildren()) do
+            for _, sound in pairs(char.LowerTorso:GetChildren()) do
+                if sound:IsA("Sound") then
+                    sound:Destroy()
+                end
+            end
+        end
     end
 
     if toggles.AntiImaginaryFriend.Value then
@@ -637,7 +642,7 @@ library:GiveSignal(runService.RenderStepped:Connect(function()
         end
     end
 
-    if player.Character.Parent.Name == "Characters" then
+    if player.Character.Parent == characters then
         if toggles.ThirdPerson.Value and options.ThirdPersonKey:GetState() then
             camera.CFrame = camera.CFrame * CFrame.new(1.5, -0.5, 6.5)
         end
