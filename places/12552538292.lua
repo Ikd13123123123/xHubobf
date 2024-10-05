@@ -64,8 +64,16 @@ local function _setupESP(properties)
     return esp
 end
 
-local function setupMonsterESP(monster, name, enableTracer)
+local function setupMonsterESP(monster, name)
     if not toggles.EntityESP.Value then return end
+
+    local tracerEnabled
+
+    if monster.Name == "Eyefestation" then
+        tracerEnabled = false
+    else
+        tracerEnabled = toggles.EntityESPTracer.Value
+    end
 
     local colour = options.EntityColour.Value
 
@@ -77,7 +85,7 @@ local function setupMonsterESP(monster, name, enableTracer)
         TextColor = colour,
 
         Tracer = {
-            Enabled = enableTracer or toggles.EntityESPTracer.Value,
+            Enabled = tracerEnabled,
             Color = colour
         }
     })
@@ -525,25 +533,23 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
 
     local interactables = room:WaitForChild("Interactables")
 
-    interactables.ChildAdded:Connect(function(interactable)
-        if interactable.Name ~= "EyefestationSpawn" then return end
+    interactables.DescendantAdded:Connect(function(descendant)
+        if descendant.Name ~= "Eyefestation" then return end
 
-        interactable.ChildAdded:Connect(function(child)
-            if toggles.EyefestationNotifier.Value then
-                getgenv().Alert("Eyefestation Spawned!")
-            end
-            if options.EntityESPList.Value["Eyefestation"] then
-                setupMonsterESP(child, "Eyefestation", false)
-            end
-            if toggles.AntiEyefestation.Value then
-                local active = child:WaitForChild("Active")
-                active.Changed:Connect(function(value)
-                    if not value then return end
+        if toggles.EyefestationNotifier.Value then
+            getgenv().Alert("Eyefestation Spawned!")
+        end
+        if options.EntityESPList.Value["Eyefestation"] then
+            setupMonsterESP(descendant)
+        end
+        if toggles.AntiEyefestation.Value then
+            local active = descendant:WaitForChild("Active")
+            active.Changed:Connect(function(value)
+                if not value then return end
 
-                    active.Value = false
-                end)
-            end
-        end)
+                active.Value = false
+            end)
+        end
     end)
 
     -- local spawn = interactables:WaitForChild("EyefestationSpawn", 1)
