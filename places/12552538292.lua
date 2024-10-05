@@ -359,8 +359,7 @@ esp.Entities:AddDropdown("EntityESPList", {
         "Pandemonium",
         "Wall Dwellers",
         "Eyefestation",
-        "Turrets",
-        "Void Mass"
+        "Turrets"
     }
 })
 
@@ -375,6 +374,12 @@ esp.Entities:AddToggle("EntityESPDistance", {
 })
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
+
+esp.Other:AddToggle("VoidMassESP", {
+    Text = "Void Mass ESP",
+    Risky = true,
+    Tooltip = "ALPHA, not working yet"
+})
 
 esp.Other:AddToggle("BeaconESP", {
     Text = "Water Beacon ESP",
