@@ -64,7 +64,7 @@ local function _setupESP(properties)
     return esp
 end
 
-local function setupMonsterESP(monster, name)
+local function setupMonsterESP(monster, name, enableTracer)
     if not toggles.EntityESP.Value then return end
 
     local colour = options.EntityColour.Value
@@ -77,7 +77,7 @@ local function setupMonsterESP(monster, name)
         TextColor = colour,
 
         Tracer = {
-            Enabled = toggles.EntityESPTracer.Value,
+            Enabled = enableTracer or toggles.EntityESPTracer.Value,
             Color = colour
         }
     })
@@ -525,15 +525,15 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
 
     local interactables = room:WaitForChild("Interactables")
 
-    local spawn = interactables:WaitForChild("EyefestationSpawn", 1)
+    interactables.ChildAdded:Connect(function(interactable)
+        if interactable.Name ~= "EyefestationSpawn" then return end
 
-    if spawn then
-        spawn.ChildAdded:Connect(function(child)
+        interactable.ChildAdded:Connect(function(child)
             if toggles.EyefestationNotifier.Value then
                 getgenv().Alert("Eyefestation Spawned!")
             end
             if options.EntityESPList.Value["Eyefestation"] then
-                setupMonsterESP(child)
+                setupMonsterESP(child, "Eyefestation", false)
             end
             if toggles.AntiEyefestation.Value then
                 local active = child:WaitForChild("Active")
@@ -544,7 +544,28 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
                 end)
             end
         end)
-    end
+    end)
+
+    -- local spawn = interactables:WaitForChild("EyefestationSpawn", 1)
+
+    -- if spawn then
+    --     spawn.ChildAdded:Connect(function(child)
+    --         if toggles.EyefestationNotifier.Value then
+    --             getgenv().Alert("Eyefestation Spawned!")
+    --         end
+    --         if options.EntityESPList.Value["Eyefestation"] then
+    --             setupMonsterESP(child)
+    --         end
+    --         if toggles.AntiEyefestation.Value then
+    --             local active = child:WaitForChild("Active")
+    --             active.Changed:Connect(function(value)
+    --                 if not value then return end
+
+    --                 active.Value = false
+    --             end)
+    --         end
+    --     end)
+    -- end
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
