@@ -427,39 +427,39 @@ esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
 esp.Players:AddToggle("PlayerESPTracer", { Text = "Tracer", Risky = true })
 
 esp.Colours:AddLabel("Items"):AddColorPicker("ItemColour", {
-    Default = Color3.fromRGB(0, 255, 0)
+    Default = Color3.fromRGB(0, 64, 255) -- Blue
 })
 
 esp.Colours:AddLabel("Documents"):AddColorPicker("DocumentColour", {
-    Default = Color3.fromRGB(255, 0, 0)
+    Default = Color3.fromRGB(255, 127, 0) -- Orange
 })
 
 esp.Colours:AddLabel("Keycards"):AddColorPicker("KeycardColour", {
-    Default = Color3.fromRGB(255, 127, 0)
+    Default = Color3.fromRGB(255, 127, 0) -- Orange
 })
 
 esp.Colours:AddLabel("Money"):AddColorPicker("MoneyColour", {
-    Default = Color3.fromRGB(255, 255, 0)
+    Default = Color3.fromRGB(255, 255, 0) -- Yellow
 })
 
 esp.Colours:AddLabel("Doors"):AddColorPicker("DoorColour", {
-    Default = Color3.fromRGB(255, 0, 255)
+    Default = Color3.fromRGB(0, 255, 255) -- Light Blue
 })
 
 esp.Colours:AddLabel("Generators"):AddColorPicker("GeneratorColour", {
-    Default = Color3.fromRGB(0, 255, 255)
+    Default = Color3.fromRGB(0, 255, 0) -- Green
 })
 
 esp.Colours:AddLabel("Levers"):AddColorPicker("LeverColour", {
-    Default = Color3.fromRGB(0, 255, 255)
+    Default = Color3.fromRGB(0, 255, 0) -- Green
 })
 
 esp.Colours:AddLabel("Entities"):AddColorPicker("EntityColour", {
-    Default = Color3.fromRGB(0, 0, 255)
+    Default = Color3.fromRGB(255, 0, 0) -- Red
 })
 
 esp.Colours:AddLabel("Players"):AddColorPicker("PlayerColour", {
-    Default = Color3.fromRGB(255, 255, 255)
+    Default = Color3.fromRGB(255, 255, 255) -- White
 })
 
 esp.Colours:AddDivider()
