@@ -19,6 +19,8 @@ local proximityPromptService = game:GetService("ProximityPromptService")
 local rooms = workspace:WaitForChild("Rooms")
 local monsters = workspace:WaitForChild("Monsters")
 local events = repStorage:WaitForChild("Events")
+local blur = lighting:WaitForChild("Blur")
+local depthOfField = lighting:WaitForChild("DepthOfField")
 
 local ESPLib = getgenv().mstudio45.ESPLibrary
 local themes = getgenv().ThemeManager
@@ -266,6 +268,23 @@ visual.Lighting:AddToggle("Fullbright", {
     end
 })
 
+visual.Lighting:AddToggle("NoFog", {
+    Text = "No Underwater Fog",
+    Callback = function(value)
+        if value then
+            blur.Size = 0
+            depthOfField.FarIntensity = 0
+        end
+    end
+})
+
+visual.Lighting:AddToggle("XRayVision", {
+    Text = "X-ray effect (Not X-ray vision haha)",
+    Callback = function(value)
+        lighting:WaitForChild("Test").Enabled = value
+    end
+})
+
 ------------------------------------------------
 
 local entity = {
@@ -346,11 +365,7 @@ esp.Interactables:AddDivider()
 
 esp.Interactables:AddToggle("InteractableESPName", { Text = "Name", Risky = true })
 
-esp.Interactables:AddToggle("InteractableESPDistance", {
-    Text = "Distance",
-    Risky = true,
-    Tooltip = "Not Implemented Yet"
-})
+esp.Interactables:AddToggle("InteractableESPDistance", { Text = "Distance", Risky = true })
 
 esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers", Risky = true })
 
@@ -366,8 +381,7 @@ esp.Entities:AddDropdown("EntityESPList", {
         "Node Monsters",
         "Pandemonium",
         "Wall Dwellers",
-        "Eyefestation",
-        "Turrets"
+        "Eyefestation"
     }
 })
 
@@ -375,24 +389,23 @@ esp.Entities:AddDivider()
 
 esp.Entities:AddToggle("EntityESPName", { Text = "Name" })
 
-esp.Entities:AddToggle("EntityESPDistance", {
-    Text = "Distance",
-    Risky = true,
-    Tooltip = "Not Implemented Yet"
-})
+esp.Entities:AddToggle("EntityESPDistance", { Text = "Distance", Risky = true })
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
 
+esp.Other:AddToggle("TurretESP", {
+    Text = "Turret ESP",
+    Risky = true
+})
+
 esp.Other:AddToggle("VoidMassESP", {
     Text = "Void Mass ESP",
-    Risky = true,
-    Tooltip = "ALPHA, not working yet"
+    Risky = true
 })
 
 esp.Other:AddToggle("BeaconESP", {
     Text = "Water Beacon ESP",
-    Risky = true,
-    Tooltip = "ALPHA, Not working yet"
+    Risky = true
 })
 
 esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
@@ -533,17 +546,17 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
 
     local interactables = room:WaitForChild("Interactables")
 
-    interactables.DescendantAdded:Connect(function(descendant)
-        if descendant.Name ~= "Eyefestation" then return end
+    interactables.DescendantAdded:Connect(function(possibleEyefestation)
+        if possibleEyefestation.Name ~= "Eyefestation" then return end
 
         if toggles.EyefestationNotifier.Value then
             getgenv().Alert("Eyefestation Spawned!")
         end
         if options.EntityESPList.Value["Eyefestation"] then
-            setupMonsterESP(descendant)
+            setupMonsterESP(possibleEyefestation)
         end
         if toggles.AntiEyefestation.Value then
-            local active = descendant:WaitForChild("Active")
+            local active = possibleEyefestation:WaitForChild("Active")
             active.Changed:Connect(function(value)
                 if not value then return end
 
@@ -551,27 +564,6 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             end)
         end
     end)
-
-    -- local spawn = interactables:WaitForChild("EyefestationSpawn", 1)
-
-    -- if spawn then
-    --     spawn.ChildAdded:Connect(function(child)
-    --         if toggles.EyefestationNotifier.Value then
-    --             getgenv().Alert("Eyefestation Spawned!")
-    --         end
-    --         if options.EntityESPList.Value["Eyefestation"] then
-    --             setupMonsterESP(child)
-    --         end
-    --         if toggles.AntiEyefestation.Value then
-    --             local active = child:WaitForChild("Active")
-    --             active.Changed:Connect(function(value)
-    --                 if not value then return end
-
-    --                 active.Value = false
-    --             end)
-    --         end
-    --     end)
-    -- end
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
