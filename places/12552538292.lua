@@ -619,7 +619,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
 end))
 
 library:GiveSignal(player.Character.LowerTorso.ChildAdded:Connect(function(child)
-    if toggles.NoFootsteps.Value then
+    if toggles.NoFootsteps.Value and child:IsA("Sound") then
         child:Destroy()
     end
 end))
