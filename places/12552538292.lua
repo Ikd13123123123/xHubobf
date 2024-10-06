@@ -135,7 +135,6 @@ local function setupCurrentRoomStuff(room)
     end
 
     table.insert(currentRoomStuff.Connections, room.DescendantAdded:Connect(function(descendant)
-        print("Added")
     end))
 end
 
@@ -611,10 +610,6 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             end)
         end
     end)
-
-    print("Room Generated")
-
-    table.foreach(room:GetChildren(), print)
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
@@ -720,17 +715,17 @@ local zoneChangeEvent = events.ZoneChange
 
 -- Method Hooking
 
-local oldMethod
-oldMethod = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-    local method = getnamecallmethod()
+-- local oldMethod
+-- oldMethod = hookfunction(zoneChangeEvent.FireServer, newcclosure(function(self, ...)
+--     local method = getnamecallmethod()
 
-    local args = { ... }
+--     local args = { ... }
 
-    if not checkcaller() and method == "FireServer" then
-        if self == zoneChangeEvent then
-            setupCurrentRoomStuff(args[1])
-        end
-    end
+--     if not checkcaller() and method == "FireServer" then
+--         if self == zoneChangeEvent then
+--             setupCurrentRoomStuff(args[1])
+--         end
+--     end
 
-    return oldMethod(self, ...)
-end))
+--     return oldMethod(self, ...)
+-- end))
