@@ -651,7 +651,7 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         end
     end
 
-    for _, interactable in pairs(room.Interactables) do
+    for _, interactable in pairs(room.Interactables:GetChildren()) do
         if options.InteractableESPList.Value["Generators"] and interactable.Name == "Generator" or interactable.Name == "EncounterGenerator" then
             table.insert(currentRoomStuff.ESP, interactableESP(interactable.Model, options.GeneratorColour.Value))
         end
