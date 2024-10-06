@@ -721,7 +721,7 @@ local zoneChangeEvent = events.ZoneChange
 -- Method Hooking
 
 local oldMethod
-oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
+oldMethod = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
 
     if method == "FireServer" then
@@ -734,4 +734,4 @@ oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
     end
 
     return oldMethod(self, ...)
-end)
+end))
