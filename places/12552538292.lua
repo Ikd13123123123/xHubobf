@@ -34,6 +34,11 @@ ESPLib:SetIsLoggingEnabled(true)
 ESPLib:SetDebugEnabled(true)
 
 local player = players.LocalPlayer
+
+local currentRoom = Instance.new("ObjectValue")
+currentRoom.Name = "CurrentRoom"
+currentRoom.Parent = player
+
 local playerGui = player.PlayerGui
 local camera = workspace.CurrentCamera
 
@@ -55,10 +60,6 @@ local nodeMonsters = {
 local currentRoomStuff = {
     Connections = {},
     ESP = {}
-}
-
-local activeConnections = {
-    FurthestRoom = {}
 }
 
 local function _ESP(properties)
@@ -125,23 +126,6 @@ end
 local function clearCurrentRoomStuff()
     for _, connection in pairs(currentRoomStuff.Connections) do connection:Disconnect() end
     for _, esp in pairs(currentRoomStuff.ESP) do esp.Destroy() end
-end
-
-local function setupCurrentRoomStuff(room)
-    clearCurrentRoomStuff()
-
-    for _, child in pairs(room:GetChildren()) do
-        if child.Name == "Lever" then
-            table.insert(currentRoomStuff.ESP, interactableESP(child, options.LeverColour.Value))
-        end
-
-        if child.Name == "MonsterLocker" then
-            table.insert(currentRoomStuff.ESP, monsterESP(child, "Void Mass"))
-        end
-    end
-
-    table.insert(currentRoomStuff.Connections, room.DescendantAdded:Connect(function(descendant)
-    end))
 end
 
 --// UI \\--
@@ -421,8 +405,7 @@ esp.Interactables:AddDropdown("InteractableESPList", {
         "Keycards",
         "Money",
         "Doors",
-        "Generators",
-        "Levers"
+        "Generators"
     }
 })
 
@@ -449,6 +432,11 @@ esp.Entities:AddDropdown("EntityESPList", {
 esp.Entities:AddDivider()
 
 esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer", Risky = true })
+
+esp.Other:AddToggle("LeverESP", {
+    Text = "Lever ESP",
+    Risky = true
+})
 
 esp.Other:AddToggle("TurretESP", {
     Text = "Turret ESP",
@@ -636,6 +624,23 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     end)
 end))
 
+library:GiveSignal(currentRoom.Changed:Connect(function(room)
+    clearCurrentRoomStuff()
+
+    for _, child in pairs(room:GetChildren()) do
+        if toggles.LeverESP.Value and child.Name == "Lever" then
+            table.insert(currentRoomStuff.ESP, interactableESP(child, options.LeverColour.Value))
+        end
+
+        if toggles.VoidMassESP.Value and child.Name == "MonsterLocker" then
+            table.insert(currentRoomStuff.ESP, monsterESP(child, "Void Mass"))
+        end
+    end
+
+    table.insert(currentRoomStuff.Connections, room.DescendantAdded:Connect(function(descendant)
+    end))
+end))
+
 library:GiveSignal(runService.RenderStepped:Connect(function()
     if toggles.NoAmbience.Value then
         local part = workspace:FindFirstChild("AmbiencePart")
@@ -723,6 +728,7 @@ library.ToggleKeybind = options.MenuKeybind
 library:OnUnload(function()
     clearCurrentRoomStuff()
     ESPLib.ESP.Clear()
+    currentRoom:Destroy()
     getgenv().Alert = nil
     getgenv().xhub_loaded = nil
 end)
@@ -743,19 +749,19 @@ saves:BuildConfigSection(tabs.Settings)
 saves:LoadAutoloadConfig()
 
 --// METHOD HOOKING \\--
--- local zoneChangeEvent = events.ZoneChange
+local zoneChangeEvent = events.ZoneChange
 
--- local oldMethod
--- oldMethod = hookfunction(zoneChangeEvent.FireServer, newcclosure(function(self, ...)
---     local method = getnamecallmethod()
+local oldMethod
+oldMethod = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local method = getnamecallmethod()
 
---     local args = { ... }
+    local args = { ... }
 
---     if not checkcaller() and method == "FireServer" then
---         if self == zoneChangeEvent then
---             setupCurrentRoomStuff(args[1])
---         end
---     end
+    if not checkcaller() and method == "FireServer" then
+        if self == zoneChangeEvent then
+            currentRoom.Value = args[1]
+        end
+    end
 
---     return oldMethod(self, ...)
--- end))
+    return oldMethod(self, ...)
+end))
