@@ -724,12 +724,11 @@ local oldMethod
 oldMethod = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
 
-    if method == "FireServer" then
-        if self == zoneChangeEvent then
-            local args = { ... }
-            local room = args[1]
+    local args = { ... }
 
-            task.spawn(setupCurrentRoomStuff, room)
+    if not checkcaller() and method == "FireServer" then
+        if self == zoneChangeEvent then
+            setupCurrentRoomStuff(args[1])
         end
     end
 
