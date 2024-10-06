@@ -428,7 +428,7 @@ esp.Entities:AddDropdown("EntityESPList", {
 
 esp.Entities:AddDivider()
 
-esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
+esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracers" })
 
 esp.Other:AddToggle("LeverESP", {
     Text = "Lever ESP",
@@ -607,7 +607,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             string.find(room.Name, "Electrfieid") or
             string.find(room.Name, "BigHole")
         ) then
-        getgenv().Alert("The next room is dangerous!")
+        getgenv().Alert("The next room is dangerous!", 10)
     end
 
     local roomCon = room.DescendantAdded:Connect(function(possibleEyefestation)
@@ -647,7 +647,8 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         end
 
         if options.EntityESPList.Value["Void Mass"] and child.Name == "MonsterLocker" then
-            table.insert(currentRoomStuff.ESP, monsterESP(child, options.VoidMassColour.Value, "Void Mass"))
+            table.insert(currentRoomStuff.ESP,
+                monsterESP(child:WaitForChild("highlight"), options.VoidMassColour.Value, "Void Mass"))
         end
     end
 
