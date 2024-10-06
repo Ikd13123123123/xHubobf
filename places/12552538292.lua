@@ -687,20 +687,15 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
 
         if locations then
             for _, location in pairs(locations:GetChildren()) do
-                local found = false
-
                 if options.InteractableESPList.Value["Keycards"] then
                     for _, name in pairs(assets.Keycards) do
                         local possible = location:FindFirstChild(name)
 
                         if possible then
                             interactableESP(possible, options.KeycardColour.Value, "Keycard")
-                            found = true
                             break
                         end
                     end
-
-                    if found then goto continue end
                 end
 
                 if options.InteractableESPList.Value["Items"] then
@@ -709,12 +704,9 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
 
                         if possible then
                             interactableESP(possible, options.ItemColour.Value)
-                            found = true
                             break
                         end
                     end
-
-                    if found then goto continue end
                 end
 
                 if options.InteractableESPList.Value["Money"] then
@@ -726,8 +718,6 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
                         end
                     end
                 end
-
-                ::continue::
             end
         end
     end
