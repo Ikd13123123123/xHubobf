@@ -729,7 +729,7 @@ oldMethod = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
             local args = { ... }
             local room = args[1]
 
-            setupCurrentRoomStuff(room)
+            task.spawn(setupCurrentRoomStuff, room)
         end
     end
 
