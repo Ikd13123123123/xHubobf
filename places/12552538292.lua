@@ -194,7 +194,16 @@ main.Movement:AddDivider()
 
 main.Movement:AddToggle("Noclip", {
     Text = "Noclip",
-    Risky = true
+    Risky = true,
+    Callback = function(value)
+        if value then
+            for _, part in pairs(player.Character:GetChildren()) do
+                if part:IsA("BasePart") or part:IsA("MeshPart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
 }):AddKeyPicker("NoclipKey", {
     Text = "Noclip",
     Default = "N",
@@ -710,10 +719,8 @@ saves:BuildConfigSection(tabs.Settings)
 
 saves:LoadAutoloadConfig()
 
--- Event Hooking
-local zoneChangeEvent = events.ZoneChange
-
--- Method Hooking
+--// METHOD HOOKING \\--
+-- local zoneChangeEvent = events.ZoneChange
 
 -- local oldMethod
 -- oldMethod = hookfunction(zoneChangeEvent.FireServer, newcclosure(function(self, ...)
