@@ -63,7 +63,7 @@ local currentRoomStuff = {
 }
 
 local function _ESP(properties)
-    local esp = ESPLib.ESP.Highlight({
+    return ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
         Model = properties.Model,
         FillColor = properties.FillColor,
@@ -75,11 +75,9 @@ local function _ESP(properties)
             Color = properties.Tracer.Color
         }
     })
-
-    return esp
 end
 
-local function monsterESP(monster, name)
+local function monsterESP(monster, colour, name)
     if not toggles.EntityESP.Value then return end
 
     local tracerEnabled
@@ -90,9 +88,7 @@ local function monsterESP(monster, name)
         tracerEnabled = toggles.EntityESPTracer.Value
     end
 
-    local colour = options.EntityColour.Value
-
-    _ESP({
+    return _ESP({
         Name = name or monster.Name,
         Model = monster,
         FillColor = colour,
@@ -109,7 +105,7 @@ end
 local function interactableESP(interactable, colour, name)
     if not toggles.InteractableESP.Value then return end
 
-    _ESP({
+    return _ESP({
         Name = name or interactable.Name,
         Model = interactable,
         FillColor = colour,
@@ -425,7 +421,8 @@ esp.Entities:AddDropdown("EntityESPList", {
         "Node Monsters",
         "Pandemonium",
         "Wall Dwellers",
-        "Eyefestation"
+        "Eyefestation",
+        "Void Mass"
     }
 })
 
@@ -440,11 +437,6 @@ esp.Other:AddToggle("LeverESP", {
 
 esp.Other:AddToggle("TurretESP", {
     Text = "Turret ESP",
-    Risky = true
-})
-
-esp.Other:AddToggle("VoidMassESP", {
-    Text = "Void Mass ESP",
     Risky = true
 })
 
@@ -485,8 +477,24 @@ esp.Colours:AddLabel("Levers"):AddColorPicker("LeverColour", {
     Default = Color3.fromRGB(0, 255, 0) -- Green
 })
 
-esp.Colours:AddLabel("Entities"):AddColorPicker("EntityColour", {
+esp.Colours:AddLabel("Node Monsters"):AddColorPicker("NodeMonsterColour", {
     Default = Color3.fromRGB(255, 0, 0) -- Red
+})
+
+esp.Colours:AddLabel("Pandemonium"):AddColorPicker("PandemoniumColour", {
+    Default = Color3.fromRGB(255, 0, 0) -- Red
+})
+
+esp.Colours:AddLabel("Wall Dwellers"):AddColorPicker("WallDwellerColour", {
+    Default = Color3.fromRGB(255, 0, 0) -- Red
+})
+
+esp.Colours:AddLabel("Eyefestation"):AddColorPicker("EyefestationColour", {
+    Default = Color3.fromRGB(0, 0, 255) -- Dark Blue
+})
+
+esp.Colours:AddLabel("Void Mass"):AddColorPicker("VoidMassColour", {
+    Default = Color3.fromRGB(255, 0, 255) -- Purple
 })
 
 esp.Colours:AddLabel("Players"):AddColorPicker("PlayerColour", {
@@ -518,7 +526,8 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
 
                     getgenv().Alert(name .. " spawned. Hide!")
 
-                    if options.EntityESPList.Value["Node Monsters"] then monsterESP(child, name) end
+                    if options.EntityESPList.Value["Node Monsters"] then monsterESP(child,
+                            options.NodeMonsterColour.Value, name) end
                 end
             end
         end
@@ -527,7 +536,7 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
             getgenv().Alert("Pandemonium spawned. Good luck!")
 
             if options.EntityESPList.Value["Pandemonium"] then
-                monsterESP(child)
+                monsterESP(child, options.PandemoniumColour.Value)
             end
         end
     end
@@ -546,7 +555,8 @@ library:GiveSignal(monsters.ChildAdded:Connect(function(monster)
         getgenv().Alert("A Wall Dweller has spawned in the walls. Find it!")
     end
 
-    if options.EntityESPList.Value["Wall Dwellers"] then monsterESP(monster, "Wall Dweller") end
+    if options.EntityESPList.Value["Wall Dwellers"] then monsterESP(monster, options.WallDwellerColour.Value,
+            "Wall Dweller") end
 end))
 
 library:GiveSignal(playerGui.ChildAdded:Connect(function(child)
@@ -603,7 +613,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("Eyefestation Spawned!")
         end
         if options.EntityESPList.Value["Eyefestation"] then
-            monsterESP(possibleEyefestation)
+            monsterESP(possibleEyefestation, options.EyefestationColour.Value)
         end
         if toggles.AntiEyefestation.Value then
             local active = possibleEyefestation:WaitForChild("Active")
@@ -632,8 +642,8 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
             table.insert(currentRoomStuff.ESP, interactableESP(child, options.LeverColour.Value))
         end
 
-        if toggles.VoidMassESP.Value and child.Name == "MonsterLocker" then
-            table.insert(currentRoomStuff.ESP, monsterESP(child, "Void Mass"))
+        if options.EntityESPList.Value["Void Mass"] and child.Name == "MonsterLocker" then
+            table.insert(currentRoomStuff.ESP, monsterESP(child, options.VoidMassColour.Value, "Void Mass"))
         end
     end
 
