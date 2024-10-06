@@ -657,7 +657,7 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         end
     end
 
-    table.insert(currentRoomStuff.Connections, room.DescendantAdded:Connect(function(descendant)
+    table.insert(currentRoomStuff.Connections, room.DescendantAddesd:Connect(function(descendant)
     end))
 end))
 
