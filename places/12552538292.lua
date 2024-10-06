@@ -193,17 +193,7 @@ main.Movement:AddSlider("JumpHeight", {
 main.Movement:AddDivider()
 
 main.Movement:AddToggle("Noclip", {
-    Text = "Noclip",
-    Risky = true,
-    Callback = function(value)
-        if value then
-            for _, part in pairs(player.Character:GetChildren()) do
-                if part:IsA("BasePart") or part:IsA("MeshPart") then
-                    part.CanCollide = false
-                end
-            end
-        end
-    end
+    Text = "Noclip"
 }):AddKeyPicker("NoclipKey", {
     Text = "Noclip",
     Default = "N",
@@ -655,6 +645,14 @@ library:GiveSignal(runService.RenderStepped:Connect(function()
     if player.Character.Parent == characters then
         if toggles.ThirdPerson.Value and options.ThirdPersonKey:GetState() then
             camera.CFrame = camera.CFrame * CFrame.new(1.5, -0.5, 6.5)
+        end
+
+        if toggles.Noclip.Value and options.NoclipKey:GetState() then
+            for _, part in pairs(player.Character:GetChildren()) do
+                if part:IsA("BasePart") or part:IsA("MeshPart") then
+                    part.CanCollide = false
+                end
+            end
         end
 
         camera.FieldOfView = options.FieldOfView.Value
