@@ -676,17 +676,16 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
     end
 
     for _, descendant in pairs(room:GetDescendants()) do
-        if not descendant:IsA("Model") then return end
-        if descendant.Parent.Parent.Name ~= "SpawnLocations" then return end
-
-        if string.find(descendant.Name, "KeyCard") then
-            table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.KeycardColour.Value, "Keycard"))
-        elseif string.find(descendant.Name, "Currency") then
-            table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.MoneyColour.Value, "Money"))
-        else
-            for _, item in pairs(assets.Items) do
-                if descendant.Name == item then
-                    table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.ItemColour.Value))
+        if descendant:IsA("Model") and descendant.Parent.Parent.Name == "SpawnLocations" then
+            if string.find(descendant.Name, "KeyCard") then
+                table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.KeycardColour.Value, "Keycard"))
+            elseif string.find(descendant.Name, "Currency") then
+                table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.MoneyColour.Value, "Money"))
+            else
+                for _, item in pairs(assets.Items) do
+                    if descendant.Name == item then
+                        table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.ItemColour.Value))
+                    end
                 end
             end
         end
