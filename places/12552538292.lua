@@ -712,8 +712,7 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
                 if options.InteractableESPList.Value["Money"] then
                     for _, child in pairs(location:GetChildren()) do
                         if string.find(child.Name, "Currency") then
-                            interactableESP()
-                            found = true
+                            interactableESP(child, options.MoneyColour.Value, "Money")
                             break
                         end
                     end
