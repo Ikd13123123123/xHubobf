@@ -37,6 +37,8 @@ local player = players.LocalPlayer
 local playerGui = player.PlayerGui
 local camera = workspace.CurrentCamera
 
+if not player.Character then player.CharacterAdded:Wait() end
+
 local nodeMonsters = {
     "Angler",
     "Froger",
@@ -191,6 +193,17 @@ main.Movement:AddSlider("JumpHeight", {
 })
 
 main.Movement:AddDivider()
+
+main.Movement:AddToggle("NoAccel", {
+    Text = "No Acceleration",
+    Callback = function(value)
+        if value then
+            player.Character.PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(100, 0.5, 0.3, 1, 1)
+        else
+            player.Character.PrimaryPart.CustomPhysicalProperties = nil
+        end
+    end
+})
 
 main.Movement:AddToggle("Noclip", {
     Text = "Noclip"
