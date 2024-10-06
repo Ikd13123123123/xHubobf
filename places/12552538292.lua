@@ -727,13 +727,11 @@ oldMethod = hookmetamethod(game, "__namecall", function(self, ...)
     local args = { ... }
     local room = args[1]
 
-    task.spawn(function()
-        if method == "FireServer" then
-            if self == zoneChangeEvent then
-                setupCurrentRoomStuff(room)
-            end
+    if method == "FireServer" then
+        if self == zoneChangeEvent then
+            task.spawn(setupCurrentRoomStuff, room)
         end
-    end)
+    end
 
     return oldMethod(self, ...)
 end)
