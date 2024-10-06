@@ -57,6 +57,23 @@ local nodeMonsters = {
     "RidgeBlitz"
 }
 
+local assets = {
+    Keycards = {
+        "InnerKeyCard",
+        "NormalKeyCard",
+        "RidgeKeyCard"
+    },
+
+    Items = {
+        "Blacklight",
+        "CodeBreacher",
+        "FlashBeacon",
+        "Flashlight",
+        "Lantern",
+        "Medkit"
+    }
+}
+
 local currentRoomStuff = {
     Connections = {},
     ESP = {}
@@ -105,8 +122,16 @@ end
 local function interactableESP(interactable, colour, name)
     if not toggles.InteractableESP.Value then return end
 
+    local iName = name or interactable.Name
+
+    if iName == "CodeBreacher" then
+        iName = "Code Breacher"
+    elseif iName == "FlashBeacon" then
+        iName = "Flash Beacon"
+    end
+
     return _ESP({
-        Name = name or interactable.Name,
+        Name = iName,
         Model = interactable,
         FillColor = colour,
         OutlineColor = colour,
@@ -657,8 +682,55 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         end
     end
 
-    table.insert(currentRoomStuff.Connections, room.DescendantAddesd:Connect(function(descendant)
-    end))
+    for _, thing in pairs(room:GetChildren()) do
+        local locations = thing:FindFirstChild("SpawnLocations")
+
+        if locations then
+            for _, location in pairs(locations:GetChildren()) do
+                local found = false
+
+                if options.InteractableESPList.Value["Keycards"] then
+                    for _, name in pairs(assets.Keycards) do
+                        local possible = location:FindFirstChild(name)
+
+                        if possible then
+                            interactableESP(possible, options.KeycardColour.Value, "Keycard")
+                            found = true
+                            break
+                        end
+                    end
+
+                    if found then goto continue end
+                end
+
+                if options.InteractableESPList.Value["Items"] then
+                    for _, name in pairs(assets.Items) do
+                        local possible = location:FindFirstChild(name)
+
+                        if possible then
+                            interactableESP(possible, options.ItemColour.Value)
+                            found = true
+                            break
+                        end
+                    end
+
+                    if found then goto continue end
+                end
+
+                if options.InteractableESPList.Value["Money"] then
+                    for _, child in pairs(location:GetChildren()) do
+                        if string.find(child.Name, "Currency") then
+                            interactableESP()
+                            found = true
+                            break
+                        end
+                    end
+                end
+
+                ::continue::
+            end
+        end
+    end
 end))
 
 library:GiveSignal(runService.RenderStepped:Connect(function()
