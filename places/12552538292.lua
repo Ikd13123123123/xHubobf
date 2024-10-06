@@ -204,14 +204,7 @@ main.Movement:AddSlider("JumpHeight", {
 main.Movement:AddDivider()
 
 main.Movement:AddToggle("NoAccel", {
-    Text = "No Acceleration",
-    Callback = function(value)
-        if value then
-            player.Character.PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(100, 0.5, 0.3, 1, 1)
-        else
-            player.Character.PrimaryPart.CustomPhysicalProperties = nil
-        end
-    end
+    Text = "No Acceleration"
 })
 
 main.Movement:AddToggle("Noclip", {
@@ -630,6 +623,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "RoundaboutDestroyed1" or
             room.Name == "LongStraightBrokenSide" or
             string.find(room.Name, "Electrfieid") or
+            string.find(room.Name, "Electrified") or
             string.find(room.Name, "BigHole")
         ) then
         getgenv().Alert("The next room is dangerous!", 10)
@@ -692,7 +686,8 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
                         local possible = location:FindFirstChild(name)
 
                         if possible then
-                            interactableESP(possible, options.KeycardColour.Value, "Keycard")
+                            table.insert(currentRoomStuff.ESP,
+                                interactableESP(possible, options.KeycardColour.Value, "Keycard"))
                             break
                         end
                     end
@@ -703,7 +698,7 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
                         local possible = location:FindFirstChild(name)
 
                         if possible then
-                            interactableESP(possible, options.ItemColour.Value)
+                            table.insert(currentRoomStuff.ESP, interactableESP(possible, options.ItemColour.Value))
                             break
                         end
                     end
@@ -712,7 +707,7 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
                 if options.InteractableESPList.Value["Money"] then
                     for _, child in pairs(location:GetChildren()) do
                         if string.find(child.Name, "Currency") then
-                            interactableESP(child, options.MoneyColour.Value, "Money")
+                            table.insert(currentRoomStuff.ESP, interactableESP(child, options.MoneyColour.Value, "Money"))
                             break
                         end
                     end
@@ -772,6 +767,12 @@ library:GiveSignal(runService.RenderStepped:Connect(function()
     player.Character.Humanoid.WalkSpeed = 16 + options.SpeedBoost.Value
 
     player.Character.Humanoid.JumpHeight = options.JumpHeight.Value
+
+    if player.Character.PrimaryPart.Massless then
+        player.Character.PrimaryPart.CustomPhysicalProperties = nil
+    elseif toggles.NoAccel.Value then
+        player.Character.PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(100, 0.5, 0.3, 1, 1)
+    end
 end))
 
 ------------------------------------------------
