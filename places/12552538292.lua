@@ -58,12 +58,6 @@ local nodeMonsters = {
 }
 
 local assets = {
-    Keycards = {
-        "InnerKeyCard",
-        "NormalKeyCard",
-        "RidgeKeyCard"
-    },
-
     Items = {
         "Blacklight",
         "CodeBreacher",
@@ -204,7 +198,12 @@ main.Movement:AddSlider("JumpHeight", {
 main.Movement:AddDivider()
 
 main.Movement:AddToggle("NoAccel", {
-    Text = "No Acceleration"
+    Text = "No Acceleration",
+    Callback = function(value)
+        if not value then
+            player.Character.PrimaryPart.CustomPhysicalProperties = nil
+        end
+    end
 })
 
 main.Movement:AddToggle("Noclip", {
@@ -676,41 +675,18 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         end
     end
 
-    for _, thing in pairs(room:GetChildren()) do
-        local locations = thing:FindFirstChild("SpawnLocations")
+    for _, descendant in pairs(room:GetDescendants()) do
+        if not descendant:IsA("Model") then return end
+        if descendant.Parent.Parent.Name ~= "SpawnLocations" then return end
 
-        if locations then
-            for _, location in pairs(locations:GetChildren()) do
-                if options.InteractableESPList.Value["Keycards"] then
-                    for _, name in pairs(assets.Keycards) do
-                        local possible = location:FindFirstChild(name)
-
-                        if possible then
-                            table.insert(currentRoomStuff.ESP,
-                                interactableESP(possible, options.KeycardColour.Value, "Keycard"))
-                            break
-                        end
-                    end
-                end
-
-                if options.InteractableESPList.Value["Items"] then
-                    for _, name in pairs(assets.Items) do
-                        local possible = location:FindFirstChild(name)
-
-                        if possible then
-                            table.insert(currentRoomStuff.ESP, interactableESP(possible, options.ItemColour.Value))
-                            break
-                        end
-                    end
-                end
-
-                if options.InteractableESPList.Value["Money"] then
-                    for _, child in pairs(location:GetChildren()) do
-                        if string.find(child.Name, "Currency") then
-                            table.insert(currentRoomStuff.ESP, interactableESP(child, options.MoneyColour.Value, "Money"))
-                            break
-                        end
-                    end
+        if string.find(descendant.Name, "KeyCard") then
+            table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.KeycardColour.Value, "Keycard"))
+        elseif string.find(descendant.Name, "Currency") then
+            table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.MoneyColour.Value, "Money"))
+        else
+            for _, item in pairs(assets.Items) do
+                if descendant.Name == item then
+                    table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.ItemColour.Value))
                 end
             end
         end
