@@ -407,7 +407,7 @@ esp.Interactables:AddDropdown("InteractableESPList", {
 
 esp.Interactables:AddDivider()
 
-esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers" })
+esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracer", Risky = true })
 
 esp.Entities:AddToggle("EntityESP", { Text = "Enabled" })
 
@@ -428,7 +428,7 @@ esp.Entities:AddDropdown("EntityESPList", {
 
 esp.Entities:AddDivider()
 
-esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracers" })
+esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
 
 esp.Other:AddToggle("LeverESP", {
     Text = "Lever ESP",
@@ -647,8 +647,13 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         end
 
         if options.EntityESPList.Value["Void Mass"] and child.Name == "MonsterLocker" then
-            table.insert(currentRoomStuff.ESP,
-                monsterESP(child:WaitForChild("highlight"), options.VoidMassColour.Value, "Void Mass"))
+            table.insert(currentRoomStuff.ESP, monsterESP(child.highlight, options.VoidMassColour.Value, "Void Mass"))
+        end
+    end
+
+    for _, interactable in pairs(room.Interactables) do
+        if options.InteractableESPList.Value["Generators"] and interactable.Name == "Generator" or interactable.Name == "EncounterGenerator" then
+            table.insert(currentRoomStuff.ESP, interactableESP(interactable.Model, options.GeneratorColour.Value))
         end
     end
 
