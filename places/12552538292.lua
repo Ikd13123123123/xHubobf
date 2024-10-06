@@ -57,6 +57,10 @@ local currentRoomStuff = {
     ESP = {}
 }
 
+local activeConnections = {
+    FurthestRoom = {}
+}
+
 local function _ESP(properties)
     local esp = ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
@@ -604,7 +608,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         getgenv().Alert("The next room is dangerous!")
     end
 
-    room.DescendantAdded:Connect(function(possibleEyefestation)
+    local roomCon = room.DescendantAdded:Connect(function(possibleEyefestation)
         if possibleEyefestation.Name ~= "Eyefestation" then return end
 
         if toggles.EyefestationNotifier.Value then
@@ -615,12 +619,20 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
         end
         if toggles.AntiEyefestation.Value then
             local active = possibleEyefestation:WaitForChild("Active")
-            active.Changed:Connect(function(value)
+            local eyefestCon = active.Changed:Connect(function(value)
                 if not value then return end
 
                 active.Value = false
             end)
+
+            possibleEyefestation.Destroying:Once(function()
+                eyefestCon:Disconnect()
+            end)
         end
+    end)
+
+    room.Destroying:Once(function()
+        roomCon:Disconnect()
     end)
 end))
 
