@@ -407,7 +407,7 @@ esp.Interactables:AddDropdown("InteractableESPList", {
 
 esp.Interactables:AddDivider()
 
-esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers", Risky = true })
+esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracers" })
 
 esp.Entities:AddToggle("EntityESP", { Text = "Enabled" })
 
@@ -428,7 +428,7 @@ esp.Entities:AddDropdown("EntityESPList", {
 
 esp.Entities:AddDivider()
 
-esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer", Risky = true })
+esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
 
 esp.Other:AddToggle("LeverESP", {
     Text = "Lever ESP",
@@ -448,6 +448,13 @@ esp.Other:AddToggle("BeaconESP", {
 esp.Players:AddToggle("PlayerESP", { Text = "Enabled", Risky = true })
 
 esp.Players:AddToggle("PlayerESPTracer", { Text = "Tracer", Risky = true })
+
+esp.Colours:AddToggle("RainbowESP", {
+    Text = "Rainbow ESP",
+    Callback = function(value) ESPLib.Rainbow.Set(value) end
+})
+
+esp.Colours:AddDivider()
 
 esp.Colours:AddLabel("Items"):AddColorPicker("ItemColour", {
     Default = Color3.fromRGB(0, 64, 255) -- Blue
@@ -501,13 +508,6 @@ esp.Colours:AddLabel("Players"):AddColorPicker("PlayerColour", {
     Default = Color3.fromRGB(255, 255, 255) -- White
 })
 
-esp.Colours:AddDivider()
-
-esp.Colours:AddToggle("RainbowESP", {
-    Text = "Rainbow ESP",
-    Callback = function(value) ESPLib.Rainbow.Set(value) end
-})
-
 --// FUNCTIONS \\--
 library:GiveSignal(proximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
     if not toggles.InstantInteract.Value then return end
@@ -526,8 +526,10 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
 
                     getgenv().Alert(name .. " spawned. Hide!")
 
-                    if options.EntityESPList.Value["Node Monsters"] then monsterESP(child,
-                            options.NodeMonsterColour.Value, name) end
+                    if options.EntityESPList.Value["Node Monsters"] then
+                        monsterESP(child,
+                            options.NodeMonsterColour.Value, name)
+                    end
                 end
             end
         end
@@ -555,8 +557,10 @@ library:GiveSignal(monsters.ChildAdded:Connect(function(monster)
         getgenv().Alert("A Wall Dweller has spawned in the walls. Find it!")
     end
 
-    if options.EntityESPList.Value["Wall Dwellers"] then monsterESP(monster, options.WallDwellerColour.Value,
-            "Wall Dweller") end
+    if options.EntityESPList.Value["Wall Dwellers"] then
+        monsterESP(monster, options.WallDwellerColour.Value,
+            "Wall Dweller")
+    end
 end))
 
 library:GiveSignal(playerGui.ChildAdded:Connect(function(child)
