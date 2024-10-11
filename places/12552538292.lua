@@ -177,25 +177,25 @@ main.Movement:AddSlider("SpeedBoost", {
     Rounding = 0
 })
 
-main.Movement:AddToggle("FasterSpeed", {
-    Text = "Faster than the monsters!",
-    Callback = function(value)
-        if value then
-            options.SpeedBoost:SetMax(90)
-        else
-            options.SpeedBoost:SetMax(45)
-        end
-    end
-})
-
-main.Movement:AddDivider()
-
 main.Movement:AddSlider("JumpHeight", {
     Text = "Jump Power",
     Default = 0,
     Min = 0,
-    Max = 20,
+    Max = 30,
     Rounding = 0
+})
+
+main.Movement:AddToggle("AbsoluteMadness", {
+    Text = "Absolute Madness",
+    Callback = function(value)
+        if value then
+            options.SpeedBoost:SetMax(900)
+            options.JumpHeight:SetMax(900)
+        else
+            options.SpeedBoost:SetMax(45)
+            options.JumpHeight:SetMax(30)
+        end
+    end
 })
 
 main.Movement:AddDivider()
@@ -626,11 +626,12 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "RoundaboutDestroyed1" or
             room.Name == "LongStraightBrokenSide" or
             room.Name == "BigHallPit" or
+            room.Name == "Overheat1" or
             string.find(room.Name, "Electrfieid") or
             string.find(room.Name, "Electrified") or
             string.find(room.Name, "BigHole")
         ) then
-        getgenv().Alert("The next room is dangerous!", 10)
+        getgenv().Alert("The next room is dangerous!", 15)
     end
 
     local roomCon = room.DescendantAdded:Connect(function(possibleEyefestation)
