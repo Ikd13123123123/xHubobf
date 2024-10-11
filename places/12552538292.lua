@@ -64,7 +64,8 @@ local assets = {
         "FlashBeacon",
         "Flashlight",
         "Lantern",
-        "Medkit"
+        "Medkit",
+        "WindupLight"
     }
 }
 
@@ -122,6 +123,8 @@ local function interactableESP(interactable, colour, name)
         iName = "Code Breacher"
     elseif iName == "FlashBeacon" then
         iName = "Flash Beacon"
+    elseif iName == "WindupLight" then
+        iName = "Hand-Cranked Flashlight"
     end
 
     return _ESP({
@@ -597,6 +600,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "KeyKeyKeyKeyKey" or
             room.Name == "AirlockStart" or
             room.Name == "HCCheckpointStart" or
+            room.Name == "Cabin?" or
             string.find(room.Name, "IntentionallyUnfinished")
         ) then
         getgenv().Alert("The next room is rare!")
@@ -621,6 +625,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
     if toggles.DangerousNotifier.Value and (
             room.Name == "RoundaboutDestroyed1" or
             room.Name == "LongStraightBrokenSide" or
+            room.Name == "BigHallPit" or
             string.find(room.Name, "Electrfieid") or
             string.find(room.Name, "Electrified") or
             string.find(room.Name, "BigHole")
@@ -677,11 +682,13 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
 
     for _, descendant in pairs(room:GetDescendants()) do
         if descendant:IsA("Model") and descendant.Parent.Parent.Name == "SpawnLocations" then
-            if string.find(descendant.Name, "KeyCard") then
+            if options.InteractableESPList.Value["Keycards"] and string.find(descendant.Name, "KeyCard") then
                 table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.KeycardColour.Value, "Keycard"))
-            elseif string.find(descendant.Name, "Currency") then
+            elseif options.InteractableESPList.Value["Money"] and string.find(descendant.Name, "Currency") then
                 table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.MoneyColour.Value, "Money"))
-            else
+            elseif options.InteractableESPList.Value["Documents"] and descendant.Name == "Document" then
+                table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.DocumentColour.Value))
+            elseif options.InteractableESPList.Value["Items"] then
                 for _, item in pairs(assets.Items) do
                     if descendant.Name == item then
                         table.insert(currentRoomStuff.ESP, interactableESP(descendant, options.ItemColour.Value))
