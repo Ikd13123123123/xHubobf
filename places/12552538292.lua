@@ -163,7 +163,7 @@ funcs.setupInteractableESP = function(interactable, colour, name, enabled)
         Model = interactable,
         Color = colour,
 
-        TracerEnabled = toggles.InteractableESPTracer.Value,
+        TracerEnabled = toggles.InteractableESPTracers.Value,
         ArrowEnabled = toggles.InteractableESPArrows.Value
     })
 
