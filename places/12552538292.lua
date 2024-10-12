@@ -75,6 +75,7 @@ local assets = {
         "FlashBeacon",
         "Flashlight",
         "Gummylight",
+        "SmallLantern",
         "Lantern",
         "Medkit",
         "WindupLight"
@@ -194,7 +195,21 @@ funcs.clearActiveRoomStuff = function()
 end
 
 funcs.checkForESP = function(obj)
-    if not obj:IsA("Model") or obj.Parent.Parent.Name ~= "SpawnLocations" then return end
+    if not obj:IsA("Model") then return end
+
+    if string.find(obj.Name, "Document") then
+        table.insert(
+            activeRoomStuff.ESP.Documents,
+            funcs.setupInteractableESP(
+                obj,
+                options.DocumentColour.Value,
+                "Document",
+                options.InteractableESPList.Value["Documents"]
+            )
+        )
+    end
+
+    if obj.Parent.Parent.Name ~= "SpawnLocations" then return end
 
     if string.find(obj.Name, "KeyCard") then
         table.insert(activeRoomStuff.ESP.Keycards,
@@ -213,16 +228,6 @@ funcs.checkForESP = function(obj)
                 options.MoneyColour.Value,
                 "Money",
                 options.InteractableESPList.Value["Money"]
-            )
-        )
-    elseif obj.Name == "Document" then
-        table.insert(
-            activeRoomStuff.ESP.Documents,
-            funcs.setupInteractableESP(
-                obj,
-                options.DocumentColour.Value,
-                "Document",
-                options.InteractableESPList.Value["Documents"]
             )
         )
     elseif contains(assets.Items, obj.Name) then
@@ -314,7 +319,7 @@ main.Movement:AddToggle("Fly", {
     Risky = true
 }):AddKeyPicker("FlyKey", {
     Text = "Fly",
-    Default = "F",
+    Default = "G",
     Mode = "Toggle"
 })
 
@@ -473,6 +478,8 @@ notifiers.Entity:AddToggle("NodeMonsterNotifier", { Text = "Node Monster Notifie
 
 notifiers.Entity:AddToggle("PandemoniumNotifier", { Text = "Pandemonium Notifier" })
 
+notifiers.Entity:AddToggle("A60Notifier", { Text = "A60 Notifier" })
+
 notifiers.Entity:AddToggle("WallDwellerNotifier", { Text = "Wall Dweller Notifier" })
 
 notifiers.Entity:AddToggle("EyefestationNotifier", { Text = "Eyefestation Notifier" })
@@ -535,6 +542,7 @@ esp.Entities:AddDropdown("EntityESPList", {
     Values = {
         "Node Monsters",
         "Pandemonium",
+        "A60",
         "Wall Dwellers",
         "Eyefestation",
         "Void Mass",
@@ -600,6 +608,10 @@ esp.Colours:AddLabel("Pandemonium"):AddColorPicker("PandemoniumColour", {
     Default = Color3.fromRGB(255, 0, 0) -- Red
 })
 
+esp.Colours:AddLabel("A60"):AddColorPicker("A60Colour", {
+    Default = Color3.fromRGB(255, 255, 255) -- Red
+})
+
 esp.Colours:AddLabel("Wall Dwellers"):AddColorPicker("WallDwellerColour", {
     Default = Color3.fromRGB(255, 0, 0) -- Red
 })
@@ -652,6 +664,17 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
                 options.PandemoniumColour.Value,
                 "Pandemonium",
                 options.EntityESPList.Value["Pandemonium"]
+            )
+        end
+
+        if child.Name == "A60" then
+            if toggles.A60Notifier.Value then getgenv().Alert("A60 SPAWNED! THAT'S RARE LOL!!!!!!!!!") end
+
+            funcs.setupMonsterESP(
+                child,
+                options.A60Colour.Value,
+                "A60",
+                options.EntityESPList.Value["A60"]
             )
         end
     end
@@ -795,22 +818,12 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
                     options.InteractableESPList.Value["Generators"]
                 )
             )
-        elseif interactable.Name == "TurretSpawn" then
-            table.insert(
-                activeRoomStuff.ESP.Entities,
-                funcs.setupMonsterESP(
-                    interactable.Turret,
-                    options.TurretColour.Value,
-                    "Turret",
-                    options.EntityESPList.Value["Turrets"]
-                )
-            )
         elseif interactable.Name == "TurretControls" then
             table.insert(activeRoomStuff.ESP.Levers,
                 funcs.setupInteractableESP(
                     interactable,
-                    options.TurretColour.Value,
-                    "Controls",
+                    options.LeverColour.Value,
+                    "Lever",
                     options.InteractableESPList.Value["Levers"]
                 )
             )
