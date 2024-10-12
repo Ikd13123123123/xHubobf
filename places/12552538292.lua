@@ -203,6 +203,9 @@ funcs.checkForESP = function(obj)
     if not obj:IsA("Model") then return end
 
     if string.find(obj.Name, "Document") then
+        if toggles.DocumentNotifier.Value then
+            getgenv().Alert("There is a document in this room! :>")
+        end
         table.insert(
             activeRoomStuff.ESP.Documents,
             funcs.setupInteractableESP(
@@ -496,7 +499,8 @@ entity.Exploits:AddToggle("AntiTurret", { Text = "Anti Turret", Risky = true })
 
 local notifiers = {
     Entity = tabs.Notifiers:AddLeftGroupbox("Entity"),
-    Rooms = tabs.Notifiers:AddRightGroupbox("Rooms")
+    Rooms = tabs.Notifiers:AddRightGroupbox("Rooms"),
+    Other = tabs.Notifiers:AddRightGroupbox("Other")
 }
 
 notifiers.Entity:AddToggle("NodeMonsterNotifier", { Text = "Node Monster Notifier" })
@@ -520,6 +524,8 @@ notifiers.Rooms:AddToggle("PuzzleNotifier", { Text = "Puzzle Room Notifier" })
 notifiers.Rooms:AddToggle("DangerousNotifier", { Text = "Dangerous Room Notifier" })
 
 notifiers.Rooms:AddToggle("RareRoomNotifier", { Text = "Rare Room Notifier" })
+
+notifiers.Other:AddToggle("DocumentNotifier", { Text = "Document Notifier" })
 
 ------------------------------------------------
 
