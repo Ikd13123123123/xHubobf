@@ -44,7 +44,7 @@ local camera = workspace.CurrentCamera
 
 if not player.Character then player.CharacterAdded:Wait() end
 
-function table.contains(_table, str)
+local function contains(_table, str)
     for _, word in pairs(_table) do
         if str == word then
             return true
@@ -219,7 +219,7 @@ funcs.checkForESP = function(obj)
                 options.InteractableESPList.Value["Documents"]
             )
         )
-    elseif table.contains(assets.Items, obj.Name) then
+    elseif contains(assets.Items, obj.Name) then
         table.insert(
             activeRoomStuff.ESP.Items,
             funcs.setupInteractableESP(
@@ -625,7 +625,7 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
     local roomNumber = events.CurrentRoomNumber:InvokeServer()
 
     if roomNumber ~= 100 then
-        if table.contains(nodeMonsters, child.Name) then
+        if contains(nodeMonsters, child.Name) then
             local name = string.gsub(child.Name, "Ridge", "")
 
             if toggles.NodeMonsterNotifier.Value then getgenv().Alert(name .. " spawned. Hide!") end
