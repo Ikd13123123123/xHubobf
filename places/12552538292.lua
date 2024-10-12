@@ -139,7 +139,9 @@ funcs.setupMonsterESP = function(monster, colour, name, enabled)
         ArrowEnabled = arrowEnabled
     })
 
-    if not toggles.EntityESP.Value or not enabled then
+    if not toggles.EntityESP.Value then
+        esp.SetVisible(false)
+    elseif not enabled then
         esp.SetVisible(false)
     end
 
@@ -174,7 +176,9 @@ funcs.setupInteractableESP = function(interactable, colour, name, enabled)
         ArrowEnabled = toggles.InteractableESPArrows.Value
     })
 
-    if not toggles.InteractableESP.Value or not enabled then
+    if not toggles.InteractableESP.Value then
+        esp.SetVisible(false)
+    elseif not enabled then
         esp.SetVisible(false)
     end
 
