@@ -44,8 +44,8 @@ local camera = workspace.CurrentCamera
 
 if not player.Character then player.CharacterAdded:Wait() end
 
-function table.contains(self, str)
-    for _, word in pairs(self) do
+function table.contains(_table, str)
+    for _, word in pairs(_table) do
         if str == word then
             return true
         end
