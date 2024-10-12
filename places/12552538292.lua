@@ -721,8 +721,9 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "Mindscape" or
             room.Name == "KeyKeyKeyKeyKey" or
             room.Name == "AirlockStart" or
-            room.Name == "HCCheckpointStart" or
             room.Name == "Cabin?" or
+            room.Name == "LookUp" or
+            room.Name == "Huh?DeadEnd?" or
             string.find(room.Name, "IntentionallyUnfinished")
         ) then
         getgenv().Alert("The next room is rare!")
@@ -749,6 +750,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "LongStraightBrokenSide" or
             room.Name == "BigHallPit" or
             room.Name == "Overheat1" or
+            room.Name == "ElectricityPuzzleFloor1" or
             string.find(room.Name, "Electrfieid") or
             string.find(room.Name, "Electrified") or
             string.find(room.Name, "BigHole")
