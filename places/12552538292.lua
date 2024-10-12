@@ -157,10 +157,14 @@ funcs.setupInteractableESP = function(interactable, colour, name)
 end
 
 funcs.clearActiveRoomStuff = function()
-    for _, connection in pairs(activeRoomStuff.Connections) do connection:Disconnect() end
+    for _, connection in pairs(activeRoomStuff.Connections) do
+        connection:Disconnect()
+        connection = nil
+    end
     for _, espTable in pairs(activeRoomStuff.ESP) do
         for _, esp in pairs(espTable) do
             esp.Destroy()
+            esp = nil
         end
     end
 end
