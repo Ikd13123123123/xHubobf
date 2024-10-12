@@ -130,7 +130,7 @@ funcs.setupMonsterESP = function(monster, colour, name, enabled)
     end
 
     local esp = funcs._ESP({
-        Name = name or monster.Name,
+        Name = name,
         Model = monster,
         Color = colour,
 
@@ -139,14 +139,20 @@ funcs.setupMonsterESP = function(monster, colour, name, enabled)
     })
 
     if not toggles.EntityESP.Value or not enabled then
-        esp:SetVisible(false)
+        esp.SetVisible(false)
     end
 
     return esp
 end
 
 funcs.setupInteractableESP = function(interactable, colour, name, enabled)
-    local iName = name or interactable.Name
+    local proxyPart = interactable:FindFirstChild("ProxyPart")
+
+    if proxyPart then
+        interactable.PrimaryPart = proxyPart
+    end
+
+    local iName = name
 
     if iName == "CodeBreacher" then
         iName = "Code Breacher"
@@ -168,7 +174,7 @@ funcs.setupInteractableESP = function(interactable, colour, name, enabled)
     })
 
     if not toggles.InteractableESP.Value or not enabled then
-        esp:SetVisible(false)
+        esp.SetVisible(false)
     end
 
     return esp
