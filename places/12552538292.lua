@@ -766,7 +766,12 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             getgenv().Alert("Eyefestation Spawned!")
         end
         if options.EntityESPList.Value["Eyefestation"] then
-            funcs.setupMonsterESP(possibleEyefestation, options.EyefestationColour.Value)
+            funcs.setupMonsterESP(
+                possibleEyefestation,
+                options.EyefestationColour.Value,
+                "Eyefestation",
+                options.EntityESPList.Value["Eyefestation"]
+            )
         end
         if toggles.AntiEyefestation.Value then
             local active = possibleEyefestation:WaitForChild("Active")
