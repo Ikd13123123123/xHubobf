@@ -155,20 +155,18 @@ funcs.setupInteractableESP = function(interactable, colour, name, enabled)
         interactable.PrimaryPart = proxyPart
     end
 
-    local iName = name
-
-    if iName == "CodeBreacher" then
-        iName = "Code Breacher"
-    elseif iName == "FlashBeacon" then
-        iName = "Flash Beacon"
-    elseif iName == "WindupLight" then
-        iName = "Hand-Cranked Flashlight"
-    elseif iName == "DwellerPiece" then
-        iName = "Wall Dweller Piece"
+    if name == "CodeBreacher" then
+        name = "Code Breacher"
+    elseif name == "FlashBeacon" then
+        name = "Flash Beacon"
+    elseif name == "WindupLight" then
+        name = "Hand-Cranked Flashlight"
+    elseif name == "DwellerPiece" then
+        name = "Wall Dweller Piece"
     end
 
     local esp = funcs._ESP({
-        Name = iName,
+        Name = name,
         Model = interactable,
         Color = colour,
 
@@ -209,6 +207,16 @@ funcs.checkForESP = function(obj)
                 options.DocumentColour.Value,
                 "Document",
                 options.InteractableESPList.Value["Documents"]
+            )
+        )
+    elseif obj.Name == "Lever" then
+        table.insert(
+            activeRoomStuff.ESP.Levers,
+            funcs.setupInteractableESP(
+                obj,
+                options.LeverColour.Value,
+                "Lever",
+                options.InteractableESPList.Value["Levers"]
             )
         )
     end
@@ -549,8 +557,7 @@ esp.Entities:AddDropdown("EntityESPList", {
         "A60",
         "Wall Dwellers",
         "Eyefestation",
-        "Void Mass",
-        "Turrets"
+        "Void Mass"
     }
 })
 
@@ -577,7 +584,7 @@ esp.Colours:AddToggle("RainbowESP", {
 esp.Colours:AddDivider()
 
 esp.Colours:AddLabel("Items"):AddColorPicker("ItemColour", {
-    Default = Color3.fromRGB(0, 64, 255) -- Blue
+    Default = Color3.fromRGB(0, 255, 255) -- Light Blue
 })
 
 esp.Colours:AddLabel("Documents"):AddColorPicker("DocumentColour", {
@@ -593,7 +600,7 @@ esp.Colours:AddLabel("Money"):AddColorPicker("MoneyColour", {
 })
 
 esp.Colours:AddLabel("Doors"):AddColorPicker("DoorColour", {
-    Default = Color3.fromRGB(0, 255, 255) -- Light Blue
+    Default = Color3.fromRGB(0, 127, 255) -- Blue
 })
 
 esp.Colours:AddLabel("Generators"):AddColorPicker("GeneratorColour", {
@@ -725,6 +732,8 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "LookUp" or
             room.Name == "Huh?DeadEnd?" or
             room.Name == "SisterLocation" or
+            room.Name == "SpiderCavern" or
+            room.Name == "LotsOfLockers" or
             string.find(room.Name, "IntentionallyUnfinished")
         ) then
         getgenv().Alert("The next room is rare!")
