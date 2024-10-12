@@ -85,6 +85,7 @@ local assets = {
 local activeRoomStuff = {
     Connections = {},
     ESP = {
+        Batteries = {},
         Items = {},
         Documents = {},
         Keycards = {},
@@ -240,6 +241,16 @@ funcs.checkForESP = function(obj)
                 options.MoneyColour.Value,
                 "Money",
                 options.InteractableESPList.Value["Money"]
+            )
+        )
+    elseif string.find(obj.Name, "Battery") then
+        table.insert(
+            activeRoomStuff.ESP.Batteries,
+            funcs.setupInteractableESP(
+                obj,
+                options.BatteryColour.Value,
+                "Battery",
+                options.InteractableESPList.Value["Batteries"]
             )
         )
     elseif contains(assets.Items, obj.Name) then
@@ -527,6 +538,7 @@ esp.Interactables:AddDropdown("InteractableESPList", {
     AllowNull = true,
     Multi = true,
     Values = {
+        "Batteries",
         "Items",
         "Documents",
         "Keycards",
@@ -582,6 +594,10 @@ esp.Colours:AddToggle("RainbowESP", {
 })
 
 esp.Colours:AddDivider()
+
+esp.Colours:AddLabel("Batteries"):AddColorPicker("BatteryColour", {
+    Default = Color3.fromRGB(0, 255, 255) -- Light Blue
+})
 
 esp.Colours:AddLabel("Items"):AddColorPicker("ItemColour", {
     Default = Color3.fromRGB(0, 255, 255) -- Light Blue
