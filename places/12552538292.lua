@@ -613,7 +613,7 @@ esp.Colours:AddLabel("Pandemonium"):AddColorPicker("PandemoniumColour", {
 })
 
 esp.Colours:AddLabel("A60"):AddColorPicker("A60Colour", {
-    Default = Color3.fromRGB(255, 255, 255) -- Red
+    Default = Color3.fromRGB(127, 0, 0) -- Dark Red
 })
 
 esp.Colours:AddLabel("Wall Dwellers"):AddColorPicker("WallDwellerColour", {
