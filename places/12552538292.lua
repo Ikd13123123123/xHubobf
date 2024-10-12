@@ -172,15 +172,16 @@ end
 funcs.checkForESP = function(obj)
     if obj:IsA("Model") and obj.Parent.Parent.Name == "SpawnLocations" then
         if options.InteractableESPList.Value["Keycards"] and string.find(obj.Name, "KeyCard") then
-            table.insert(activeRoomStuff.ESP, funcs.setupInteractableESP(obj, options.KeycardColour.Value, "Keycard"))
+            table.insert(activeRoomStuff.ESP.Keycards,
+                funcs.setupInteractableESP(obj, options.KeycardColour.Value, "Keycard"))
         elseif options.InteractableESPList.Value["Money"] and string.find(obj.Name, "Currency") then
-            table.insert(activeRoomStuff.ESP, funcs.setupInteractableESP(obj, options.MoneyColour.Value, "Money"))
+            table.insert(activeRoomStuff.ESP.Money, funcs.setupInteractableESP(obj, options.MoneyColour.Value, "Money"))
         elseif options.InteractableESPList.Value["Documents"] and obj.Name == "Document" then
-            table.insert(activeRoomStuff.ESP, funcs.setupInteractableESP(obj, options.DocumentColour.Value))
+            table.insert(activeRoomStuff.ESP.Documents, funcs.setupInteractableESP(obj, options.DocumentColour.Value))
         elseif options.InteractableESPList.Value["Items"] then
             for _, item in pairs(assets.Items) do
                 if obj.Name == item then
-                    table.insert(activeRoomStuff.ESP, funcs.setupInteractableESP(obj, options.ItemColour.Value))
+                    table.insert(activeRoomStuff.ESP.Items, funcs.setupInteractableESP(obj, options.ItemColour.Value))
                 end
             end
         end
@@ -703,7 +704,7 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
 
     for _, child in pairs(room:GetChildren()) do
         if options.EntityESPList.Value["Void Mass"] and child.Name == "MonsterLocker" then
-            table.insert(activeRoomStuff.ESP,
+            table.insert(activeRoomStuff.ESP.Entities,
                 funcs.setupMonsterESP(child.highlight, options.VoidMassColour.Value, "Void Mass"))
         end
     end
@@ -712,20 +713,21 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
         if options.InteractableESPList.Value["Generators"] then
             if (interactable.Name == "Generator" or interactable.Name == "EncounterGenerator") then
                 table.insert(
-                    activeRoomStuff.ESP,
+                    activeRoomStuff.ESP.Generators,
                     funcs.setupInteractableESP(interactable.Model, options.GeneratorColour.Value, "Generator")
                 )
             elseif interactable.Name == "BrokenCables" then
                 table.insert(
-                    activeRoomStuff.ESP,
+                    activeRoomStuff.ESP.Generators,
                     funcs.setupInteractableESP(interactable.Model, options.GeneratorColour.Value, "Cable")
                 )
             end
         elseif options.EntityESPList.Value["Turrets"] then
             if interactable.Name == "TurretSpawn" then
-                table.insert(activeRoomStuff.ESP, funcs.setupMonsterESP(interactable.Turret, options.TurretColour.Value))
+                table.insert(activeRoomStuff.ESP.Entities,
+                    funcs.setupMonsterESP(interactable.Turret, options.TurretColour.Value))
             elseif interactable.Name == "TurretControls" then
-                table.insert(activeRoomStuff.ESP,
+                table.insert(activeRoomStuff.ESP.Levers,
                     funcs.setupInteractableESP(interactable, options.TurretColour.Value, "Controls"))
             end
         end
