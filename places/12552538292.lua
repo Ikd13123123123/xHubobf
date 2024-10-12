@@ -175,7 +175,7 @@ funcs.setupInteractableESP = function(interactable, colour, name, enabled)
         ArrowEnabled = toggles.InteractableESPArrows.Value
     })
 
-    print(enabled)
+    print(not enabled)
 
     if not toggles.InteractableESP.Value then
         esp.SetVisible(false)
