@@ -724,6 +724,7 @@ library:GiveSignal(rooms.ChildAdded:Connect(function(room)
             room.Name == "Cabin?" or
             room.Name == "LookUp" or
             room.Name == "Huh?DeadEnd?" or
+            room.Name == "SisterLocation" or
             string.find(room.Name, "IntentionallyUnfinished")
         ) then
         getgenv().Alert("The next room is rare!")
