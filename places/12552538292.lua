@@ -44,6 +44,16 @@ local camera = workspace.CurrentCamera
 
 if not player.Character then player.CharacterAdded:Wait() end
 
+function table.contains(self, str)
+    for _, word in pairs(self) do
+        if str == word then
+            return true
+        end
+    end
+
+    return false
+end
+
 local nodeMonsters = {
     "Angler",
     "Froger",
@@ -91,45 +101,51 @@ funcs._ESP = function(properties)
     return ESPLib.ESP.Highlight({
         Name = properties.Name or "No Text",
         Model = properties.Model,
-        FillColor = properties.FillColor,
-        OutlineColor = properties.OutlineColor,
-        TextColor = properties.TextColor,
+        FillColor = properties.Color,
+        OutlineColor = properties.Color,
+        TextColor = properties.Color,
 
         Tracer = {
-            Enabled = properties.Tracer.Enabled,
-            Color = properties.Tracer.Color
+            Enabled = properties.TracerEnabled,
+            Color = properties.Color
+        },
+
+        Arrow = {
+            Enabled = properties.ArrowEnabled,
+            Color = properties.Color
         }
     })
 end
 
-funcs.setupMonsterESP = function(monster, colour, name)
-    if not toggles.EntityESP.Value then return end
-
+funcs.setupMonsterESP = function(monster, colour, name, enabled)
     local tracerEnabled
+    local arrowEnabled
 
     if monster.Name == "Eyefestation" then
         tracerEnabled = false
+        arrowEnabled = false
     else
-        tracerEnabled = toggles.EntityESPTracer.Value
+        tracerEnabled = toggles.EntityESPTracers.Value
+        arrowEnabled = toggles.EntityESPArrows.Value
     end
 
-    return funcs._ESP({
+    local esp = funcs._ESP({
         Name = name or monster.Name,
         Model = monster,
-        FillColor = colour,
-        OutlineColor = colour,
-        TextColor = colour,
+        Color = colour,
 
-        Tracer = {
-            Enabled = tracerEnabled,
-            Color = colour
-        }
+        TracerEnabled = tracerEnabled,
+        ArrowEnabled = arrowEnabled
     })
+
+    if not toggles.EntityESP.Value or not enabled then
+        esp:SetVisible(false)
+    end
+
+    return esp
 end
 
-funcs.setupInteractableESP = function(interactable, colour, name)
-    if not toggles.InteractableESP.Value then return end
-
+funcs.setupInteractableESP = function(interactable, colour, name, enabled)
     local iName = name or interactable.Name
 
     if iName == "CodeBreacher" then
@@ -142,18 +158,20 @@ funcs.setupInteractableESP = function(interactable, colour, name)
         iName = "Wall Dweller Piece"
     end
 
-    return funcs._ESP({
+    local esp = funcs._ESP({
         Name = iName,
         Model = interactable,
-        FillColor = colour,
-        OutlineColor = colour,
-        TextColor = colour,
+        Color = colour,
 
-        Tracer = {
-            Enabled = toggles.InteractableESPTracer.Value,
-            Color = colour
-        }
+        TracerEnabled = toggles.InteractableESPTracer.Value,
+        ArrowEnabled = toggles.InteractableESPArrows.Value
     })
+
+    if not toggles.InteractableESP.Value or not enabled then
+        esp:SetVisible(false)
+    end
+
+    return esp
 end
 
 funcs.clearActiveRoomStuff = function()
@@ -170,21 +188,47 @@ funcs.clearActiveRoomStuff = function()
 end
 
 funcs.checkForESP = function(obj)
-    if obj:IsA("Model") and obj.Parent.Parent.Name == "SpawnLocations" then
-        if options.InteractableESPList.Value["Keycards"] and string.find(obj.Name, "KeyCard") then
-            table.insert(activeRoomStuff.ESP.Keycards,
-                funcs.setupInteractableESP(obj, options.KeycardColour.Value, "Keycard"))
-        elseif options.InteractableESPList.Value["Money"] and string.find(obj.Name, "Currency") then
-            table.insert(activeRoomStuff.ESP.Money, funcs.setupInteractableESP(obj, options.MoneyColour.Value, "Money"))
-        elseif options.InteractableESPList.Value["Documents"] and obj.Name == "Document" then
-            table.insert(activeRoomStuff.ESP.Documents, funcs.setupInteractableESP(obj, options.DocumentColour.Value))
-        elseif options.InteractableESPList.Value["Items"] then
-            for _, item in pairs(assets.Items) do
-                if obj.Name == item then
-                    table.insert(activeRoomStuff.ESP.Items, funcs.setupInteractableESP(obj, options.ItemColour.Value))
-                end
-            end
-        end
+    if not obj:IsA("Model") or obj.Parent.Parent.Name ~= "SpawnLocations" then return end
+
+    if string.find(obj.Name, "KeyCard") then
+        table.insert(activeRoomStuff.ESP.Keycards,
+            funcs.setupInteractableESP(
+                obj,
+                options.KeycardColour.Value,
+                "Keycard",
+                options.InteractableESPList.Value["Keycards"]
+            )
+        )
+    elseif string.find(obj.Name, "Currency") then
+        table.insert(
+            activeRoomStuff.ESP.Money,
+            funcs.setupInteractableESP(
+                obj,
+                options.MoneyColour.Value,
+                "Money",
+                options.InteractableESPList.Value["Money"]
+            )
+        )
+    elseif obj.Name == "Document" then
+        table.insert(
+            activeRoomStuff.ESP.Documents,
+            funcs.setupInteractableESP(
+                obj,
+                options.DocumentColour.Value,
+                "Document",
+                options.InteractableESPList.Value["Documents"]
+            )
+        )
+    elseif table.contains(assets.Items, obj.Name) then
+        table.insert(
+            activeRoomStuff.ESP.Items,
+            funcs.setupInteractableESP(
+                obj,
+                options.ItemColour.Value,
+                obj.Name,
+                options.InteractableESPList.Value["Items"]
+            )
+        )
     end
 end
 
@@ -470,7 +514,9 @@ esp.Interactables:AddDropdown("InteractableESPList", {
 
 esp.Interactables:AddDivider()
 
-esp.Interactables:AddToggle("InteractableESPTracer", { Text = "Tracer" })
+esp.Interactables:AddToggle("InteractableESPTracers", { Text = "Tracers" })
+
+esp.Interactables:AddToggle("InteractableESPArrows", { Text = "Arrows" })
 
 esp.Entities:AddToggle("EntityESP", { Text = "Enabled" })
 
@@ -492,7 +538,9 @@ esp.Entities:AddDropdown("EntityESPList", {
 
 esp.Entities:AddDivider()
 
-esp.Entities:AddToggle("EntityESPTracer", { Text = "Tracer" })
+esp.Entities:AddToggle("EntityESPTracers", { Text = "Tracers" })
+
+esp.Entities:AddToggle("EntityESPArrows", { Text = "Arrows" })
 
 esp.Other:AddToggle("BeaconESP", {
     Text = "Water Beacon ESP",
@@ -577,26 +625,28 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
     local roomNumber = events.CurrentRoomNumber:InvokeServer()
 
     if roomNumber ~= 100 then
-        if toggles.NodeMonsterNotifier.Value then
-            for _, monster in ipairs(nodeMonsters) do
-                if child.Name == monster then
-                    local name = string.gsub(monster, "Ridge", "")
+        if table.contains(nodeMonsters, child.Name) then
+            local name = string.gsub(child.Name, "Ridge", "")
 
-                    getgenv().Alert(name .. " spawned. Hide!")
+            if toggles.NodeMonsterNotifier.Value then getgenv().Alert(name .. " spawned. Hide!") end
 
-                    if options.EntityESPList.Value["Node Monsters"] then
-                        funcs.setupMonsterESP(child, options.NodeMonsterColour.Value, name)
-                    end
-                end
-            end
+            funcs.setupMonsterESP(
+                child,
+                options.NodeMonsterColour.Value,
+                name,
+                options.EntityESPList.Value["Node Monsters"]
+            )
         end
 
-        if toggles.PandemoniumNotifier.Value and child.Name == "Pandemonium" then
-            getgenv().Alert("Pandemonium spawned. Good luck!")
+        if child.Name == "Pandemonium" then
+            if toggles.PandemoniumNotifier.Value then getgenv().Alert("Pandemonium spawned. Good luck!") end
 
-            if options.EntityESPList.Value["Pandemonium"] then
-                funcs.setupMonsterESP(child, options.PandemoniumColour.Value)
-            end
+            funcs.setupMonsterESP(
+                child,
+                options.PandemoniumColour.Value,
+                "Pandemonium",
+                options.EntityESPList.Value["Pandemonium"]
+            )
         end
     end
 
@@ -610,13 +660,15 @@ library:GiveSignal(workspace.ChildAdded:Connect(function(child)
 end))
 
 library:GiveSignal(monsters.ChildAdded:Connect(function(monster)
-    if toggles.WallDwellerNotifier.Value and monster.Name == "WallDweller" then
-        getgenv().Alert("A Wall Dweller has spawned in the walls. Find it!")
-    end
+    if monster.Name == "WallDweller" then
+        if toggles.WallDwellerNotifier.Value then getgenv().Alert("A Wall Dweller has spawned in the walls. Find it!") end
 
-    if options.EntityESPList.Value["Wall Dwellers"] then
-        funcs.setupMonsterESP(monster, options.WallDwellerColour.Value,
-            "Wall Dweller")
+        funcs.setupMonsterESP(
+            monster,
+            options.WallDwellerColour.Value,
+            "Wall Dweller",
+            options.EntityESPList.Value["Wall Dwellers"]
+        )
     end
 end))
 
@@ -703,42 +755,68 @@ library:GiveSignal(currentRoom.Changed:Connect(function(room)
     funcs.clearActiveRoomStuff()
 
     for _, child in pairs(room:GetChildren()) do
-        if options.EntityESPList.Value["Void Mass"] and child.Name == "MonsterLocker" then
-            table.insert(activeRoomStuff.ESP.Entities,
-                funcs.setupMonsterESP(child.highlight, options.VoidMassColour.Value, "Void Mass"))
+        if child.Name == "MonsterLocker" then
+            table.insert(
+                activeRoomStuff.ESP.Entities,
+                funcs.setupMonsterESP(
+                    child.highlight,
+                    options.VoidMassColour.Value,
+                    "Void Mass",
+                    options.EntityESPList.Value["Void Mass"]
+                )
+            )
         end
     end
 
     for _, interactable in pairs(room.Interactables:GetChildren()) do
-        if options.InteractableESPList.Value["Generators"] then
-            if (interactable.Name == "Generator" or interactable.Name == "EncounterGenerator") then
-                table.insert(
-                    activeRoomStuff.ESP.Generators,
-                    funcs.setupInteractableESP(interactable.Model, options.GeneratorColour.Value, "Generator")
+        if (interactable.Name == "Generator" or interactable.Name == "EncounterGenerator") then
+            table.insert(
+                activeRoomStuff.ESP.Generators,
+                funcs.setupInteractableESP(
+                    interactable.Model,
+                    options.GeneratorColour.Value,
+                    "Generator",
+                    options.InteractableESPList.Value["Generators"]
                 )
-            elseif interactable.Name == "BrokenCables" then
-                table.insert(
-                    activeRoomStuff.ESP.Generators,
-                    funcs.setupInteractableESP(interactable.Model, options.GeneratorColour.Value, "Cable")
+            )
+        elseif interactable.Name == "BrokenCables" then
+            table.insert(
+                activeRoomStuff.ESP.Generators,
+                funcs.setupInteractableESP(
+                    interactable.Model,
+                    options.GeneratorColour.Value,
+                    "Cable",
+                    options.InteractableESPList.Value["Generators"]
                 )
-            end
-        elseif options.EntityESPList.Value["Turrets"] then
-            if interactable.Name == "TurretSpawn" then
-                table.insert(activeRoomStuff.ESP.Entities,
-                    funcs.setupMonsterESP(interactable.Turret, options.TurretColour.Value))
-            elseif interactable.Name == "TurretControls" then
-                table.insert(activeRoomStuff.ESP.Levers,
-                    funcs.setupInteractableESP(interactable, options.TurretColour.Value, "Controls"))
-            end
+            )
+        elseif interactable.Name == "TurretSpawn" then
+            table.insert(
+                activeRoomStuff.ESP.Entities,
+                funcs.setupMonsterESP(
+                    interactable.Turret,
+                    options.TurretColour.Value,
+                    "Turret",
+                    options.EntityESPList.Value["Turrets"]
+                )
+            )
+        elseif interactable.Name == "TurretControls" then
+            table.insert(activeRoomStuff.ESP.Levers,
+                funcs.setupInteractableESP(
+                    interactable,
+                    options.TurretColour.Value,
+                    "Controls",
+                    options.InteractableESPList.Value["Levers"]
+                )
+            )
         end
     end
 
-    for _, descendant in pairs(room:GetDescendants()) do
-        funcs.checkForESP(descendant)
+    for _, obj in pairs(room:GetDescendants()) do
+        funcs.checkForESP(obj)
     end
 
-    table.insert(activeRoomStuff.Connections, room.DescendantAdded:Connect(function(descendant)
-        funcs.checkForESP(descendant)
+    table.insert(activeRoomStuff.Connections, room.DescendantAdded:Connect(function(obj)
+        funcs.checkForESP(obj)
     end))
 end))
 
